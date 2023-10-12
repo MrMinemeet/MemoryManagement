@@ -4,4 +4,4 @@ The Project for the LVA [System Software](https://ssw.jku.at/Teaching/Lectures/S
 The project is performed by @BioGustav aka. Tobias and myself (MrMinemeet aka. Alex)
 
 ---
-* Full Task Description: [MemoryManagementProject.pdf](https://ssw.jku.at/Teaching/Lectures/SSW/MemoryManagementProject.pdf)https://ssw.jku.at/Teaching/Lectures/SSW/MemoryManagementProject.pdf
+* Full Task Description: [MemoryManagementProject.pdf](https://ssw.jku.at/Teaching/Lectures/SSW/MemoryManagementProject.pdf)
