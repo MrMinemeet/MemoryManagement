@@ -1,15 +1,21 @@
 #ifndef TYPEDESCRIPTOR_HPP
 #define TYPEDESCRIPTOR_HPP
 
-class TypeDescriptor {
-	public:
-		// Declare member functions, data members, or any other class-specific elements here
+#include <string>
 
-		// For example:
-		TypeDescriptor();  // Constructor declaration
+class TypeDescriptor {
+	private:
+		int offsetAmount;
+
+	public:
+		int objectOffset;
+		int* pointerOffsetArray;
+
+		TypeDescriptor(int obj_size, int* pointer_offset_array, int offset_amount);  // Constructor declaration
 		~TypeDescriptor(); // Destructor declaration
 
-		// Additional member function declarations, if needed
+		// ToString method declaration
+		std::string ToString();
 };
 
 #endif // TYPEDESCRIPTOR_HPP
