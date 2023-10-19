@@ -5,3 +5,7 @@ The project is performed by [@BioGustav](https://github.com/BioGustav) aka. Tobi
 
 ---
 * Full Task Description: [MemoryManagementProject.pdf](https://ssw.jku.at/Teaching/Lectures/SSW/MemoryManagementProject.pdf)
+
+
+# How to build?
+Use `cmake --build .`.

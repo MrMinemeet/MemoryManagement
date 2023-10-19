@@ -6,5 +6,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Create a list of source files in the src directory
+file(GLOB SOURCE_FILES "src/*.cpp")
+
 # Add an executable target
-add_executable(SystemSoftware_MemoryManagement src/main.cpp)
+add_executable(SystemSoftware_MemoryManagement ${SOURCE_FILES})
