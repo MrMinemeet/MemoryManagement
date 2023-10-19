@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="SystemSoftware_MemoryManagement"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="SystemSoftware_MemoryManagement">
+				<Option output="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/SystemSoftware_MemoryManagement" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 SystemSoftware_MemoryManagement"/>
+					<CompileFile command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="SystemSoftware_MemoryManagement/fast">
+				<Option output="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/SystemSoftware_MemoryManagement" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 SystemSoftware_MemoryManagement/fast"/>
+					<CompileFile command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/gmake -f &quot;/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1.\ Semester/System\ Software/SystemSoftware_MemoryManagement/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/Block.cpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/Block.hpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/Heap.cpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/Heap.hpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/Lecture.cpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/Lecture.hpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/TypeDescriptor.cpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/TypeDescriptor.hpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/src/main.cpp">
+			<Option target="SystemSoftware_MemoryManagement"/>
+		</Unit>
+		<Unit filename="/home/mrminemeet/GoogleDrive/Schule-Uni/JKU/Master/1. Semester/System Software/SystemSoftware_MemoryManagement/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
