@@ -5,3 +5,7 @@ The project is performed by @BioGustav aka. Tobias and myself (MrMinemeet aka. A
 
 ---
 * Full Task Description: [MemoryManagementProject.pdf](https://ssw.jku.at/Teaching/Lectures/SSW/MemoryManagementProject.pdf)
+
+
+# How to build?
+Use `cmake --build .`.
