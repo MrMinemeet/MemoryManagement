@@ -7,7 +7,15 @@ int main() {
 	std::cout << "Hello, GC user!" << std::endl;
 
 	Heap heap;
-	heap.alloc(10);
+	std::cout << heap.ToString() << std::endl;
+
+	auto a = heap.alloc(8*1024);
+	auto b = heap.alloc(8*1024);
+	auto c = heap.alloc(8*1024);
+	auto d = heap.alloc(8*1024);
+
+
+	std::cout << heap.ToString() << std::endl;
 	heap.dealloc();
 
 	int* array = new int[2];
