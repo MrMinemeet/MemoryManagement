@@ -20,6 +20,13 @@ class Block {
 
 		// Additional member function declarations, if needed
 		std::string ToString();
+
+		/**
+		 * Returns the data pointer of this block.
+		 * @return the data pointer of this block.
+		 * @return nullptr if this block is free.
+		 */
+		void* data();
 };
 
 #endif // BLOCK_HPP
