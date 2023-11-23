@@ -7,7 +7,7 @@ class Block {
 	public:
 		// Heap
 		bool used;
-		int size;
+		uint size;
 
 		// GC
 		/*
@@ -15,11 +15,11 @@ class Block {
 		Block* left;
 		Block* right;
 		*/
-		Block(int size);  // Constructor declaration
+		Block(uint size);  // Constructor declaration
 		~Block(); // Destructor declaration
 
 		// Additional member function declarations, if needed
-		std::string ToString();
+		std::string ToString() const;
 
 		/**
 		 * Returns the data pointer of this block.

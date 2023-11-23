@@ -3,6 +3,7 @@
 
 #include <unordered_map>
 #include <string>
+#include "Declarations.hpp"
 #include "Block.hpp"
 
 #include <iostream>
@@ -11,9 +12,9 @@
 
 class Heap {
 private:
-    const int HEAP_SIZE = 32 * 1024; // 32 KB
+    const uint HEAP_SIZE = 8 KiB;
     void* heap_buffer;
-	int free_bytes;
+	uint free_bytes;
     std::list<Block*> free;
 	std::unordered_map<std::string, TypeDescriptor*> type_map;
 

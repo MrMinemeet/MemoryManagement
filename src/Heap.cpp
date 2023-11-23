@@ -5,8 +5,18 @@
 // Define the member functions of the Heap class here
 Heap::Heap() {
     this->heap_buffer = std::malloc(HEAP_SIZE);
-	this->free = {new (heap_buffer) Block(HEAP_SIZE)};
+
+#if DEBUG
+	// Fill memory with 0xff (for debugging)
+	for(int i = 0; i < HEAP_SIZE; ++i) {
+		((char*)heap_buffer)[i] = (char)0xff;
+	}
+#endif
+
+	this->free = {new (heap_buffer) Block(HEAP_SIZE - sizeof(Block))}; // - sizeof(Block) because of the overhead
 	this->free_bytes = HEAP_SIZE;
+
+
     std::cout << "A new heap has been created!" << std::endl;
 }
 
@@ -16,45 +26,59 @@ Heap::~Heap() {
 }
 
 Block* Heap::alloc(int size) {
+	std::cout << "Trying to allocate " << size << " bytes of memory..." << std::endl;
 	if (size > free_bytes) {
 		std::cout << "Not enough memory!" << std::endl;
 		return nullptr;
 	}
-    std::cout << "Trying to allocate " << size << " bytes of memory..." << std::endl;
     // Implement the allocation logic here
 
+	// Look for free block that fits the to be allocated size + bit of overhead (sizeof(Block))
 	Block* current = nullptr;
 	for (Block* block: free) {
 		current = block;
-		if (current->size >= size+4) {
+		if (current->size >= size+sizeof(Block)) {
 			break;
 		}
 	}
 
-	if (current->size < size+4) {
+	// Check if last block in "free" list is big enough
+	if (current->size < size+sizeof(Block)) {
 		std::cout << "Not enough memory!" << std::endl;
 		return nullptr;
 	}
 
-	auto p = current;
-	int new_size = current->size - (size + 4);
-	if (new_size >= 8) { // split block
-		char* position = (char*) current + current->size - size - 4;
-		p = new (position) Block(size + 4);
+	Block* p = current;
+	int new_size = current->size - size - sizeof(Block);
+	if (new_size >= 2*sizeof(Block)) { // split block
+		//char* atBack = (char*) current + current->size + sizeof(Block);
+		//char* withSpaceForBlock = atBack - size;
+		//char* withOverhead = withSpaceForBlock - sizeof(Block);
+		//char* position = withOverhead;
+		char* position = (char*) current + current->size - size; // sizeof(Block) can be dropped
+		p = new (position) Block(size);
 		current->size = new_size;
 	} else { // remove block from freelist
 		free.remove(current);
 	}
-
-	free_bytes -= size;
-
 	p->used = true;
+
+#if DEBUG
+	// Fill memory with 0xab (for debugging)
+	for(int i = 0; i < size; ++i) {
+		((char*)p)[i + sizeof(Block)] = (char)0xab;
+	}
+#endif
+
+	free_bytes -= size + sizeof(Block);
+
+	std::cout << "Allocated " << size << " bytes of memory at " << p << std::endl;
 	return p;
 }
 
 void Heap::dealloc() {
     std::cout << "Deallocating memory..." << std::endl;
-    // Implement the deallocation logic here
+    // Implement the reallocation logic here
 }
 
 /// Register a type with the Heap. Will return true if the type was successfully registered, false otherwise.
