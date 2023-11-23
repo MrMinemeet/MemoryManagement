@@ -27,7 +27,7 @@ public:
 
     // Methods
     Block* alloc(int size);
-    void dealloc();
+    void dealloc(Block* block);
     bool registerType(std::string& type, TypeDescriptor& descriptor);
 	std::string ToString();
 };

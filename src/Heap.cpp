@@ -76,8 +76,28 @@ Block* Heap::alloc(int size) {
 	return p;
 }
 
-void Heap::dealloc() {
+void Heap::dealloc(Block* block) {
     std::cout << "Deallocating memory..." << std::endl;
+
+	auto p = (Block*)heap_buffer;
+	Block* left = nullptr;
+	while (p != block) {
+		left = p;
+		p = (Block*)((char*)p + p->size + sizeof(Block));
+	}
+	if (left != nullptr && !left->used) {
+		// merge left
+	} else {
+		// add p to freelist
+	}
+
+	Block* right = (Block*)((char*)p + p->size + sizeof(Block));
+	if (!right->used) {
+		// remove right from freelist
+		// merge p and right
+	}
+
+
     // Implement the reallocation logic here
 }
 
