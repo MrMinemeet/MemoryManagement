@@ -22,7 +22,7 @@ int main() {
 
 
 	std::cout << heap.ToString() << std::endl;
-	heap.dealloc();
+	heap.dealloc(a);
 
 	int* array = new int[2];
 	array[0] = 1;
