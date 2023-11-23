@@ -18,7 +18,7 @@ int main() {
 	auto a = heap.alloc(512);
 	auto b = heap.alloc(400);
 	auto c = heap.alloc(8 KiB);
-	//auto d = heap.alloc(8*1024);
+	//auto d = heap.alloc(8 KiB);
 
 
 	std::cout << heap.ToString() << std::endl;
