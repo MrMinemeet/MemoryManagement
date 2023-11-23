@@ -1,18 +1,24 @@
 #include <iostream>
 #include <string>
+#include "Declarations.hpp"
 #include "Heap.hpp"
 #include "TypeDescriptor.hpp"
 
 int main() {
+#if DEBUG
+	std::cout << "DEBUG-mode enabled!" << std::endl;
+#endif
+
 	std::cout << "Hello, GC user!" << std::endl;
 
 	Heap heap;
+
 	std::cout << heap.ToString() << std::endl;
 
-	auto a = heap.alloc(8*1024);
-	auto b = heap.alloc(8*1024);
-	auto c = heap.alloc(8*1024);
-	auto d = heap.alloc(8*1024);
+	auto a = heap.alloc(512);
+	auto b = heap.alloc(400);
+	auto c = heap.alloc(8 KiB);
+	//auto d = heap.alloc(8*1024);
 
 
 	std::cout << heap.ToString() << std::endl;

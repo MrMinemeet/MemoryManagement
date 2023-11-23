@@ -1,7 +1,13 @@
 #include "Block.hpp"
 
 
-Block::Block(int size) {
+/*
+ * Takes 8 bytes in memory
+ * 1 byte for the used flag
+ * 4 bytes for the size
+ * 3 bytes padding/alignment
+ */
+Block::Block(uint size) {
 	this->used = false;
 	this->size = size;
 }
@@ -12,14 +18,17 @@ void* Block::data() {
 	if (!this->used) {
 		return nullptr;
 	}
-	return &this[0]+1;
+	return &this[0] + 1;
 }
 
-std::string Block::ToString() {
+std::string Block::ToString() const {
 	std::string str = "Block {";
-	str += "used: " + std::to_string(this->used) + ", ";
+	if ((this->used)) {
+		str += "used: true, ";
+	} else {
+		str += "used: false, ";
+	}
 	str += "size: " + std::to_string(this->size);
 	str += "}";
 	return str;
 }
-
