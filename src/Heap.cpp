@@ -51,11 +51,11 @@ Block* Heap::alloc(int size) {
 	Block* p = current;
 	int new_size = current->size - size - sizeof(Block);
 	if (new_size >= 2*sizeof(Block)) { // split block
-		char* atBack = (char*) current + current->size + sizeof(Block);
-		char* withSpaceForBlock = atBack - size;
-		char* withOverhead = withSpaceForBlock;
-		char* position = withOverhead;
-		//char* position = (char*) current + current->size - size - sizeof(Block);
+		//char* atBack = (char*) current + current->size + sizeof(Block);
+		//char* withSpaceForBlock = atBack - size;
+		//char* withOverhead = withSpaceForBlock - sizeof(Block);
+		//char* position = withOverhead;
+		char* position = (char*) current + current->size - size; // sizeof(Block) can be dropped
 		p = new (position) Block(size);
 		current->size = new_size;
 	} else { // remove block from freelist
@@ -65,8 +65,8 @@ Block* Heap::alloc(int size) {
 
 #if DEBUG
 	// Fill memory with 0xab (for debugging)
-	for(int i = sizeof(Block); i < size; ++i) {
-		((char*)p)[i] = (char)0xab;
+	for(int i = 0; i < size; ++i) {
+		((char*)p)[i + sizeof(Block)] = (char)0xab;
 	}
 #endif
 

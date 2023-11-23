@@ -23,7 +23,7 @@ void* Block::data() {
 
 std::string Block::ToString() const {
 	std::string str = "Block {";
-	if ((this->used)) {
+	if (this->used) {
 		str += "used: true, ";
 	} else {
 		str += "used: false, ";
