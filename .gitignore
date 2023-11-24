@@ -41,6 +41,8 @@ CMakeFiles/
 build/
 Testing/
 CMakeCache.txt
+cmake_install.cmake
+Makefile
 
 # Binary
 SystemSoftware_MemoryManagement
