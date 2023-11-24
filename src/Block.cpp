@@ -14,11 +14,17 @@ Block::Block(uint size) {
 
 Block::~Block() = default;
 
+/*
+ * Returns the effective address of the data of the block.
+ * If the block is not marked as "used", then a nullptr is returned
+ */
 void* Block::data() {
 	if (!this->used) {
 		return nullptr;
 	}
-	return &this[0] + 1;
+
+	// "this + 1" is the effective data for the block
+	return this + 1;
 }
 
 std::string Block::ToString() const {
