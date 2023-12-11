@@ -27,9 +27,10 @@ public:
     ~Heap();
 
     // Methods
-    Block* alloc(int size);
+	Block* alloc(int size);
+	Block* alloc(const std::string& type);
     void dealloc(Block* block);
-    bool registerType(std::string& type, TypeDescriptor& descriptor);
+    bool registerType(const std::string& type, TypeDescriptor& descriptor);
 	std::string ToString();
 };
 
