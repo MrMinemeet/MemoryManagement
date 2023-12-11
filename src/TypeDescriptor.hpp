@@ -8,7 +8,7 @@ class TypeDescriptor {
 		int offsetAmount;
 
 	public:
-		int objectSize;
+		int totalSize;
 		int* pointerOffsetArray;
 
 		TypeDescriptor(int obj_size, int* pointer_offset_array, int offset_amount);  // Constructor declaration

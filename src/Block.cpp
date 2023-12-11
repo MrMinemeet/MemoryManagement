@@ -8,10 +8,9 @@
  * 8 bytes for the typeDescriptor pointer
  * 3 bytes padding
  */
-Block::Block(uint dataSize) {
+Block::Block(TypeDescriptor* typeDescriptor) {
 	this->used = false;
-	this->dataSize = dataSize;
-	this->typeDescriptor = nullptr;
+	this->typeDescriptor = typeDescriptor;
 }
 
 Block::~Block() = default;
@@ -29,6 +28,18 @@ void* Block::data() {
 	return this + 1;
 }
 
+int Block::totalSize() const {
+	return typeDescriptor->totalSize;
+}
+
+int Block::headerSize() {
+	return sizeof(Block);
+}
+
+int Block::dataSize() const {
+	return totalSize() - headerSize();
+}
+
 std::string Block::ToString() const {
 	std::string str = "Block { ";
 	if (this->used) {
@@ -36,7 +47,15 @@ std::string Block::ToString() const {
 	} else {
 		str += "used: false, ";
 	}
-	str += "dataSize: " + std::to_string(this->dataSize);
-	str += " }";
+	str += "totalSize: " + std::to_string(totalSize()) + ", ";
+	str += "headerSize: " + std::to_string(headerSize()) + ",";
+	str += "dataSize: " + std::to_string(dataSize());
+	str += "}";
 	return str;
+}
+
+Block* Block::createFreeBlock(int position, int size) {
+	char* pos = (char*) position + sizeof(TypeDescriptor);
+	Block* freeBlk = (Block*) pos;
+
 }

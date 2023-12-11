@@ -38,17 +38,17 @@ Block* Heap::alloc(int size) {
 	}
 	// Implement the allocation logic here
 
-	// Look for free block that fits the to be allocated dataSize + bit of overhead (sizeof(Block))
+	// Look for free block that fits the to be allocated dataSize()+ bit of overhead (sizeof(Block))
 	Block* current = nullptr;
 	for (Block* block: free) {
 		current = block;
-		if (current->dataSize >= size + sizeof(Block)) {
+		if (current->dataSize() >= size + sizeof(Block)) {
 			break;
 		}
 	}
 
 	// Check if last block in "free" list is big enough
-	if (current->dataSize < size + sizeof(Block)) {
+	if (current->dataSize() < size + sizeof(Block)) {
 		std::cout << "Not enough memory!" << std::endl;
 		return nullptr;
 	}
@@ -59,15 +59,16 @@ Block* Heap::alloc(int size) {
 	}
 
 	Block* p = current;
-	int new_size = current->dataSize - size - sizeof(Block);
+	int new_size = current->dataSize()- size - sizeof(Block);
 	if (new_size >= 2 * sizeof(Block)) {// split block
-		//char* atBack = (char*) current + current->dataSize + sizeof(Block);
+		//char* atBack = (char*) current + current->dataSize()+ sizeof(Block);
 		//char* withSpaceForBlock = atBack - dataSize;
 		//char* withOverhead = withSpaceForBlock - sizeof(Block);
 		//char* position = withOverhead;
-		char* position = (char*) current + current->dataSize - size;// sizeof(Block) can be dropped
+		char* position = (char*) current + current->dataSize()- size;// sizeof(Block) can be dropped
 		p = new (position) Block(size);
-		current->dataSize = new_size;
+		// FIXME: how to set data
+		current->dataSize()= new_size;
 	} else {// remove block from freelist
 		free.remove(current);
 	}
@@ -94,8 +95,8 @@ Block* Heap::alloc(const std::string& type) {
 		return nullptr;
 	}
 
-	// Get dataSize of object from typeDescriptor descriptor
-	int objectSize = descriptor->objectSize;
+	// Get dataSize()of object from typeDescriptor descriptor
+	int objectSize = descriptor->totalSize;
 
 	// Allocate memory
 	Block* block = alloc(objectSize);
@@ -114,7 +115,7 @@ void Heap::dealloc(Block* block) {
 	Block* left = nullptr;
 	while (p != block) {
 		left = p;
-		p = (Block*) ((char*) p + p->dataSize + sizeof(Block));
+		p = (Block*) ((char*) p + p->dataSize()+ sizeof(Block));
 	}
 	if (left != nullptr && !left->used) {
 		// merge left
@@ -122,7 +123,7 @@ void Heap::dealloc(Block* block) {
 		// add p to freelist
 	}
 
-	Block* right = (Block*) ((char*) p + p->dataSize + sizeof(Block));
+	Block* right = (Block*) ((char*) p + p->dataSize()+ sizeof(Block));
 	if (!right->used) {
 		// remove right from freelist
 		// merge p and right
