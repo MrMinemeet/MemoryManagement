@@ -16,7 +16,6 @@ Heap::Heap() {
 	this->free = {new (heap_buffer) Block(HEAP_SIZE - sizeof(Block))}; // - sizeof(Block) because of the overhead
 	this->free_bytes = HEAP_SIZE;
 
-
     std::cout << "A new heap has been created!" << std::endl;
 }
 
