@@ -12,6 +12,7 @@
 
 class Heap {
 private:
+	// TODO: Adjust heap to 32 KiB for the final submission
     const uint HEAP_SIZE = 8 KiB;
     void* heap_buffer;
 	uint free_bytes;
