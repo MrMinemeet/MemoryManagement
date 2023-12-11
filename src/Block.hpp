@@ -9,7 +9,6 @@ public:
 	// Heap
 	TypeDescriptor* typeDescriptor;
 	bool used;
-	uint dataSize;
 
 	// GC
 	/*
@@ -17,8 +16,11 @@ public:
 	Block* left;
 	Block* right;
 	*/
-	Block(uint dataSize);// Constructor declaration
-	~Block();		 // Destructor declaration
+
+	// Constructor declaration
+	Block(TypeDescriptor* typeDescriptor);
+	// Destructor declaration
+	~Block();
 
 	// Additional member function declarations, if needed
 	std::string ToString() const;
@@ -29,6 +31,13 @@ public:
 	* @return nullptr if this block is free.
 	*/
 	void* data();
+
+	int totalSize() const;
+	static int headerSize();
+	int dataSize() const;
+
+	// Creator for new free block
+	static Block* createFreeBlock(int position, int size);
 };
 
 #endif// BLOCK_HPP
