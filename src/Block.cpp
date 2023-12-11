@@ -4,12 +4,14 @@
 /*
  * Takes 8 bytes in memory
  * 1 byte for the used flag
- * 4 bytes for the size
- * 3 bytes padding/alignment
+ * 4 bytes for the dataSize
+ * 8 bytes for the typeDescriptor pointer
+ * 3 bytes padding
  */
-Block::Block(uint size) {
+Block::Block(uint dataSize) {
 	this->used = false;
-	this->size = size;
+	this->dataSize = dataSize;
+	this->typeDescriptor = nullptr;
 }
 
 Block::~Block() = default;
@@ -34,7 +36,7 @@ std::string Block::ToString() const {
 	} else {
 		str += "used: false, ";
 	}
-	str += "size: " + std::to_string(this->size);
+	str += "dataSize: " + std::to_string(this->dataSize);
 	str += " }";
 	return str;
 }

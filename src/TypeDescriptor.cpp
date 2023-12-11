@@ -16,7 +16,7 @@ TypeDescriptor::~TypeDescriptor() {
 std::string TypeDescriptor::ToString() {
 	// ToString implementation
 	std::string str = "TypeDescriptor {\n";
-	str += "\tObject size: " + std::to_string(this->objectSize) + "\n";
+	str += "\tObject dataSize: " + std::to_string(this->objectSize) + "\n";
 	str += "\tPointer offset array: [";
 	for (int i = 0; i < this->offsetAmount; i++) {
 		str += std::to_string(this->pointerOffsetArray[i]);

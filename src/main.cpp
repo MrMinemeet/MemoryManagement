@@ -19,9 +19,10 @@ int main() {
 	std::cout << td.ToString() << std::endl;
 #if DEBUG
 	if(heap.registerType("Block", td)) {
-		std::cout << "Successfully registered type!" << std::endl;
+		std::cout << "Successfully registered typeDescriptor!" << std::endl;
 	} else {
-		std::cout << "Failed to register type!" << std::endl;
+		std::cout << "Failed to register typeDescriptor!" << std::endl;
+		return 1;
 	}
 #endif
 
@@ -42,11 +43,11 @@ int main() {
 	array[0] = 1;
 	array[1] = 2;
 
-	std::string type = "int";
+	std::string typeDescriptor = "int";
 	TypeDescriptor descriptor(8, array, 2);
 	std::cout << descriptor.ToString() << std::endl;
 
-	heap.registerType(type, descriptor);
+	heap.registerType(typeDescriptor, descriptor);
 
 	std::cout << heap.ToString() << std::endl;
 
