@@ -47,6 +47,11 @@ Block* Heap::alloc(int size) {
 		return nullptr;
 	}
 
+	if(current == nullptr) {
+		std::cout << "Somehow 'current' block pointer got null" << std::endl;
+		return nullptr;
+	}
+
 	Block* p = current;
 	int new_size = current->size - size - sizeof(Block);
 	if (new_size >= 2*sizeof(Block)) { // split block
@@ -75,6 +80,21 @@ Block* Heap::alloc(int size) {
 	return p;
 }
 
+Block* Heap::alloc(const std::string& type) {
+	// Get type descriptor from type_map
+	TypeDescriptor* descriptor = type_map[type];
+	if (descriptor == nullptr) {
+		std::cout << "Type " << type << " not found!" << std::endl;
+		return nullptr;
+	}
+
+	// Get size of object from type descriptor
+	int objectSize = descriptor->objectSize;
+
+	// Allocate memory
+	return alloc(objectSize);
+}
+
 void Heap::dealloc(Block* block) {
     std::cout << "Deallocating memory..." << std::endl;
 
@@ -96,12 +116,11 @@ void Heap::dealloc(Block* block) {
 		// merge p and right
 	}
 
-
     // Implement the reallocation logic here
 }
 
 /// Register a type with the Heap. Will return true if the type was successfully registered, false otherwise.
-bool Heap::registerType(std::string& type, TypeDescriptor& descriptor) {
+bool Heap::registerType(const std::string& type, TypeDescriptor& descriptor) {
 	if (type_map.find(type) != type_map.end()) {
 		std::cout << "Type " << type << " already exists!" << std::endl;
 		return false;
@@ -113,16 +132,19 @@ bool Heap::registerType(std::string& type, TypeDescriptor& descriptor) {
 
 std::string Heap::ToString() {
 	std::string postfix;
-	std::string str = "Heap size: " + std::to_string(HEAP_SIZE) + "\n";
-	str += "Free bytes: " + std::to_string(free_bytes) + "\n";
+	std::string str = "Heap {\n";
+	str += "\tHeap size: " + std::to_string(HEAP_SIZE) + "\n";
+	str += "\tFree bytes: " + std::to_string(free_bytes) + "\n";
+	str += "\tStored type descriptors: " + std::to_string(type_map.size()) + "\n";
 
 
-	str += "Free blocks {\n";
+	str += "\tFree blocks {\n";
 	for (Block* block : free) {
-		str += "\t" + block->ToString() + postfix + "\n";
+		str += "\t\t" + block->ToString() + postfix + "\n";
 		postfix = ", ";
 	}
-	str += "}\n";
+	str += "\t}\n";
+	str += "}";
 
 	return str;
 }

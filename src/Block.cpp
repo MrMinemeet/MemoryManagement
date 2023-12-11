@@ -28,13 +28,13 @@ void* Block::data() {
 }
 
 std::string Block::ToString() const {
-	std::string str = "Block {";
+	std::string str = "Block { ";
 	if (this->used) {
 		str += "used: true, ";
 	} else {
 		str += "used: false, ";
 	}
 	str += "size: " + std::to_string(this->size);
-	str += "}";
+	str += " }";
 	return str;
 }
