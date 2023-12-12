@@ -13,7 +13,8 @@ Heap::Heap() {
 	}
 #endif
 
-	this->free = {new (heap_buffer) Block(HEAP_SIZE - sizeof(Block))};// - sizeof(Block) because of the overhead
+
+	this->free = {new (heap_buffer) Block((TypeDescriptor*) heap_buffer + 1)};// - sizeof(Block) because of the overhead
 	this->free_bytes = HEAP_SIZE;
 
 	std::cout << "A new heap has been created!" << std::endl;
@@ -72,7 +73,7 @@ Block* Heap::alloc(const std::string& type) {
 		curBlock = new (position) Block(descriptor);
 
 		// FIXME: how to set data
-		current->dataSize() = new_size;
+		((char*) current)[1] = new_size;
 	} else {// remove block from freelist
 		free.remove(current);
 	}
