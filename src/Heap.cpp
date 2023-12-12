@@ -30,13 +30,20 @@ Heap::~Heap() {
  * Block-header | data ("size" bytes)
  *               ^___ returned Block*
  */
-Block* Heap::alloc(int size) {
+Block* Heap::alloc(const std::string& type) {
+	// Get typeDescriptor descriptor from type_map
+	TypeDescriptor* descriptor = type_map[type];
+	if (descriptor == nullptr) {
+		std::cout << "Type " << type << " not found!" << std::endl;
+		return nullptr;
+	}
+
+	int size = descriptor->totalSize;
 	std::cout << "Trying to allocate " << size << " bytes of memory..." << std::endl;
 	if (size > free_bytes) {
 		std::cout << "Not enough memory!" << std::endl;
 		return nullptr;
 	}
-	// Implement the allocation logic here
 
 	// Look for free block that fits the to be allocated dataSize()+ bit of overhead (sizeof(Block))
 	Block* current = nullptr;
@@ -58,54 +65,31 @@ Block* Heap::alloc(int size) {
 		return nullptr;
 	}
 
-	Block* p = current;
-	int new_size = current->dataSize()- size - sizeof(Block);
-	if (new_size >= 2 * sizeof(Block)) {// split block
-		//char* atBack = (char*) current + current->dataSize()+ sizeof(Block);
-		//char* withSpaceForBlock = atBack - dataSize;
-		//char* withOverhead = withSpaceForBlock - sizeof(Block);
-		//char* position = withOverhead;
-		char* position = (char*) current + current->dataSize()- size;// sizeof(Block) can be dropped
-		p = new (position) Block(size);
+	Block* curBlock = current;
+	int new_size = current->dataSize() - size - sizeof(Block);
+	if (new_size >= 2 * sizeof(Block)) {							  // split block
+		char* position = (char*) current + current->dataSize() - size;// sizeof(Block) can be dropped
+		curBlock = new (position) Block(descriptor);
+
 		// FIXME: how to set data
-		current->dataSize()= new_size;
+		current->dataSize() = new_size;
 	} else {// remove block from freelist
 		free.remove(current);
 	}
-	p->used = true;
+	curBlock->used = true;
 
 #if DEBUG
 	// Fill memory with 0xab (for debugging)
 	for (int i = 0; i < size; ++i) {
-		((char*) p)[i + sizeof(Block)] = (char) 0xab;
+		((char*) curBlock)[i + sizeof(Block)] = (char) 0xab;
 	}
 #endif
 
 	free_bytes -= size + sizeof(Block);
 
-	std::cout << "Allocated " << size << " bytes of memory at " << p << std::endl;
-	return p;
-}
+	std::cout << "Allocated " << size << " bytes of memory at " << curBlock << std::endl;
 
-Block* Heap::alloc(const std::string& type) {
-	// Get typeDescriptor descriptor from type_map
-	TypeDescriptor* descriptor = type_map[type];
-	if (descriptor == nullptr) {
-		std::cout << "Type " << type << " not found!" << std::endl;
-		return nullptr;
-	}
-
-	// Get dataSize()of object from typeDescriptor descriptor
-	int objectSize = descriptor->totalSize;
-
-	// Allocate memory
-	Block* block = alloc(objectSize);
-
-	// Set typeDescriptor of block
-	if (block != nullptr) {
-		block->typeDescriptor = descriptor;
-	}
-	return block;
+	return curBlock;
 }
 
 void Heap::dealloc(Block* block) {
@@ -115,7 +99,7 @@ void Heap::dealloc(Block* block) {
 	Block* left = nullptr;
 	while (p != block) {
 		left = p;
-		p = (Block*) ((char*) p + p->dataSize()+ sizeof(Block));
+		p = (Block*) ((char*) p + p->dataSize() + sizeof(Block));
 	}
 	if (left != nullptr && !left->used) {
 		// merge left
@@ -123,7 +107,7 @@ void Heap::dealloc(Block* block) {
 		// add p to freelist
 	}
 
-	Block* right = (Block*) ((char*) p + p->dataSize()+ sizeof(Block));
+	Block* right = (Block*) ((char*) p + p->dataSize() + sizeof(Block));
 	if (!right->used) {
 		// remove right from freelist
 		// merge p and right
