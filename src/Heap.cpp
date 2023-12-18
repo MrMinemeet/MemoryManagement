@@ -9,12 +9,11 @@ Heap::Heap() {
 #if DEBUG
 	// Fill memory with 0xff (for debugging)
 	for (int i = 0; i < HEAP_SIZE; ++i) {
-		((char*) heap_buffer)[i] = (char) 0xff;
+		((char*) heap_buffer)[i] = (char) 0xaa;
 	}
 #endif
 
-
-	this->free = {new (heap_buffer) Block((TypeDescriptor*) heap_buffer + 1)};// - sizeof(Block) because of the overhead
+	this->fbHead = new (heap_buffer) FreeBlock(HEAP_SIZE - sizeof(FreeBlock));// - sizeof(FreeBlock) because of the overhead
 	this->free_bytes = HEAP_SIZE;
 
 	std::cout << "A new heap has been created!" << std::endl;
@@ -26,71 +25,71 @@ Heap::~Heap() {
 }
 
 /*
- * Takes memory of size "size" + sizeOf(Block) from the heap in a "first-fit" fashion.
- * The memory part, where the actual data is stored, is returned. I.e., the header of the first sizeof(Block) are skipped
- * Block-header | data ("size" bytes)
- *               ^___ returned Block*
+ * Takes a chunk of size "sizeof(Block) + type.totalSize" from heap and return Block pointer
  */
 Block* Heap::alloc(const std::string& type) {
-	// Get typeDescriptor descriptor from type_map
-	TypeDescriptor* descriptor = type_map[type];
-	if (descriptor == nullptr) {
-		std::cout << "Type " << type << " not found!" << std::endl;
+	TypeDescriptor* typeDescriptor = type_map[type];
+	if (typeDescriptor == nullptr) {
+		std::cerr << "Type " << type << " not found!" << std::endl;
 		return nullptr;
 	}
+	int dataSize = typeDescriptor->totalSize;
+	int totalSize = dataSize + sizeof(Block);
+#if DEBUG
+	std::cout << "Allocating a total of " << totalSize << " bytes from heap for " << dataSize << " bytes of data…" << std::endl;
+#endif
 
-	int size = descriptor->totalSize;
-	std::cout << "Trying to allocate " << size << " bytes of memory..." << std::endl;
-	if (size > free_bytes) {
-		std::cout << "Not enough memory!" << std::endl;
-		return nullptr;
-	}
-
-	// Look for free block that fits the to be allocated dataSize()+ bit of overhead (sizeof(Block))
-	Block* current = nullptr;
-	for (Block* block: free) {
-		current = block;
-		if (current->dataSize() >= size + sizeof(Block)) {
+	// Go through free list and find a free block with enough space
+	FreeBlock* cur = fbHead;
+	FreeBlock* prev = nullptr;
+	while(cur != nullptr) {
+		if (cur->totalSize() >= totalSize) {
+			// Found a free block with enough space
 			break;
+		}
+		prev = cur;
+		cur = cur->getNextFree();
+	}
+	if (cur == nullptr) {
+		std::cerr << "No free block with enough space found!" << std::endl;
+		return nullptr;
+	}
+	// check if it is necessary/worth it to split the block
+	int newLength = cur->totalSize() - (totalSize + sizeof(Block));
+	if (newLength < sizeof (FreeBlock)) {
+		// Don't split, not enough space for a new FreeBlock
+		// Remove cur from free list
+		if (prev == nullptr) {
+			// cur is the head of the free list, set the next free block as the new head
+			fbHead = cur->getNextFree();
+		} else {
+			// cur is not the head of the free list, set the next free block as the next free block of the previous block
+			*(FreeBlock**) prev->getNextFreePointer() = cur->getNextFree();
+		}
+	} else {
+		// Split
+		// Create a new FreeBlock after the allocated block
+		FreeBlock* newFreeBlock = new ((char*) cur + totalSize) FreeBlock(newLength - sizeof(FreeBlock));
+		// Set the next freeBlock of the new FreeBlock to the next free block of cur
+		*(FreeBlock**) newFreeBlock->getNextFreePointer() = cur->getNextFree();
+		// Set the nextFreeBlock of prev to the new FreeBlock
+		if (prev == nullptr) {
+			// cur is the head of the free list, set the new FreeBlock as the new head
+			fbHead = newFreeBlock;
+		} else {
+			// cur is not the head of the free list, set the new FreeBlock as the next free block of the previous block
+			*(FreeBlock**) prev->getNextFreePointer() = newFreeBlock;
 		}
 	}
 
-	// Check if last block in "free" list is big enough
-	if (current->dataSize() < size + sizeof(Block)) {
-		std::cout << "Not enough memory!" << std::endl;
-		return nullptr;
-	}
+	// Set the typeDescriptor of the allocated block
+	Block* block = new (cur) Block(typeDescriptor);
 
-	if (current == nullptr) {
-		std::cout << "Somehow 'current' block pointer got null" << std::endl;
-		return nullptr;
-	}
+	// Adjust free_bytes
+	free_bytes -= totalSize;
 
-	Block* curBlock = current;
-	int new_size = current->dataSize() - size - sizeof(Block);
-	if (new_size >= 2 * sizeof(Block)) {							  // split block
-		char* position = (char*) current + current->dataSize() - size;// sizeof(Block) can be dropped
-		curBlock = new (position) Block(descriptor);
-
-		// FIXME: how to set data
-		((char*) current)[1] = new_size;
-	} else {// remove block from freelist
-		free.remove(current);
-	}
-	curBlock->used = true;
-
-#if DEBUG
-	// Fill memory with 0xab (for debugging)
-	for (int i = 0; i < size; ++i) {
-		((char*) curBlock)[i + sizeof(Block)] = (char) 0xab;
-	}
-#endif
-
-	free_bytes -= size + sizeof(Block);
-
-	std::cout << "Allocated " << size << " bytes of memory at " << curBlock << std::endl;
-
-	return curBlock;
+	// Return the allocated block
+	return block;
 }
 
 void Heap::dealloc(Block* block) {
@@ -131,18 +130,56 @@ bool Heap::registerType(const std::string& type, TypeDescriptor& descriptor) {
 std::string Heap::ToString() {
 	std::string postfix;
 	std::string str = "Heap {\n";
-	str += "\tHeap dataSize: " + std::to_string(HEAP_SIZE) + "\n";
-	str += "\tFree bytes: " + std::to_string(free_bytes) + "\n";
-	str += "\tStored typeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
+	str += "Heap dataSize: " + std::to_string(HEAP_SIZE) + "\n";
+	str += "Free bytes: " + std::to_string(free_bytes) + "\n";
+	str += "Stored typeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
 
-
-	str += "\tFree blocks {\n";
-	for (Block* block: free) {
-		str += "\t\t" + block->ToString() + postfix + "\n";
-		postfix = ", ";
+	/*
+	str += "Live blocks { ";
+	int traversedSize = 0;
+	Block* bCur = (Block*) heap_buffer;
+	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
+		if (bCur->used) {
+			str += "" + bCur->ToString() + postfix;
+			postfix = ", ";
+		}
+		traversedSize += bCur->totalSize();
+		bCur = (Block*) ((char*) bCur + bCur->dataSize() + sizeof(Block));
 	}
-	str += "\t}\n";
+	str += " }\n";
+	 */
+
+	str += "Free blocks { ";
+	FreeBlock* fbCur = fbHead;
+	while (fbCur != nullptr) {
+		str += "" + fbCur->ToString() + postfix;
+		postfix = ", ";
+		fbCur = fbCur->getNextFree();
+	}
+	str += " }\n";
 	str += "}";
 
 	return str;
+}
+
+/**
+ * Prints a list of all live objects as well as free blocks.
+ * Print the total amount of memory used by live objects.
+ * For every live object the following values should be printed:
+ * - address (hex)
+ * - name of the object's type
+ * - the first 4 bytes of te object in hex form (to get a clue of the object's contents)
+ * - a list of all pointers in this object (in hex form)
+ *
+ */
+void Heap::dump() {
+	std::cout << std::endl;
+	std::cout << "Dumping heap..." << std::endl;
+	std::string str = "Total bytes used: " + std::to_string(HEAP_SIZE - free_bytes) + "\n";
+	str += "Live objects: { ";
+
+	str += " }";
+	std::cout << str << std::endl;
+	std::cout << "Heap dumped!" << std::endl;
+	std::cout << std::endl;
 }

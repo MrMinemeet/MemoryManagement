@@ -10,4 +10,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 file(GLOB SOURCE_FILES "src/*.cpp")
 
 # Add an executable target
-add_executable(SystemSoftware_MemoryManagement ${SOURCE_FILES})
+add_executable(SystemSoftware_MemoryManagement ${SOURCE_FILES}
+        src/FreeBlock.cpp
+        src/FreeBlock.hpp)

@@ -15,17 +15,17 @@ TypeDescriptor::~TypeDescriptor() {
 
 std::string TypeDescriptor::ToString() {
 	// ToString implementation
-	std::string str = "TypeDescriptor {\n";
-	str += "\tObject dataSize: " + std::to_string(this->totalSize) + "\n";
-	str += "\tPointer offset array: [";
+	std::string str = "TypeDescriptor { ";
+	str += "Object dataSize: " + std::to_string(this->totalSize) + ", ";
+	str += "Pointer offset array: [";
 	for (int i = 0; i < this->offsetAmount; i++) {
 		str += std::to_string(this->pointerOffsetArray[i]);
 		if (i != this->offsetAmount - 1) {
 			str += ", ";
 		}
 	}
-	str += "]\n";
-	str += "\tOffset amount: " + std::to_string(this->offsetAmount) + "\n";
-	str += "}";
+	str += "], ";
+	str += "Offset amount: " + std::to_string(this->offsetAmount);
+	str += " }";
 	return str;
 }

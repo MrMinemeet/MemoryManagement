@@ -26,18 +26,15 @@ public:
 	std::string ToString() const;
 
 	/**
-	* Returns the data pointer of this block.
-	* @return the data pointer of this block.
+	* Returns the getDataPart pointer of this block.
+	* @return the getDataPart pointer of this block.
 	* @return nullptr if this block is free.
 	*/
-	void* data();
+	void* getDataPart();
 
 	int totalSize() const;
 	static int headerSize();
 	int dataSize() const;
-
-	// Creator for new free block
-	static Block* createFreeBlock(int position, int size);
 };
 
 #endif// BLOCK_HPP
