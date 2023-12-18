@@ -6,6 +6,7 @@
 #include <string>
 #include <unordered_map>
 
+#include "FreeBlock.hpp"
 #include "TypeDescriptor.hpp"
 #include <iostream>
 #include <list>
@@ -13,10 +14,10 @@
 class Heap {
 private:
 	// TODO: Adjust heap to 32 KiB for the final submission
-	const uint HEAP_SIZE = 8 KiB;
+	const uint HEAP_SIZE = 32; //1 KiB;
 	void* heap_buffer;
 	uint free_bytes;
-	std::list<Block*> free;
+	FreeBlock* fbHead;
 	std::unordered_map<std::string, TypeDescriptor*> type_map;
 
 public:
@@ -30,6 +31,7 @@ public:
 	Block* alloc(const std::string& type);
 	void dealloc(Block* block);
 	bool registerType(const std::string& type, TypeDescriptor& descriptor);
+	void dump();
 	std::string ToString();
 };
 

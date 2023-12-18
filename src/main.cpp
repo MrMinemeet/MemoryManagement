@@ -12,9 +12,8 @@ int main() {
 	Heap heap;
 	std::cout << heap.ToString() << std::endl;
 
-
 	// TD based on "Garbage Collection" slide-set page 22
-	// Create TypeDescriptor for a class (Block x; Block y; int data; Block z;)
+	// Create TypeDescriptor for a class (Block x; Block y; int getDataPart; Block z;)
 	TypeDescriptor td = TypeDescriptor(20, new int[3]{0, 4, 12}, 3);
 	std::cout << td.ToString() << std::endl;
 #if DEBUG
@@ -25,6 +24,7 @@ int main() {
 		return 1;
 	}
 #endif
+
 
 	Block* blockFromTD = heap.alloc("Block");
 	std::cout << blockFromTD->ToString() << std::endl;
