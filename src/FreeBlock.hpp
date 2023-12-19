@@ -23,6 +23,7 @@ public:
 private:
 	void* dataPosition() const;
 	int getObjSize() const;
+	void setNextFreePointer(void* nextFree);
 };
 
 

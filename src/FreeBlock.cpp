@@ -20,15 +20,15 @@ FreeBlock::FreeBlock(int requestedSize) : Block(typeDescriptor) {
 	this->typeDescriptor = (TypeDescriptor*) dataPosition();
 	// Size of the data part of the whole free block
 	*(int*) dataPosition() = sizeof(FreeBlock) + requestedSize;
-	// Pointer to the next free block
-	*(void**) getNextFreePointer() = nullptr;
+	// Pointer to the next free block, which is nullptr per default
+	setNextFreePointer(nullptr);
 }
 
 /**
  * Returns the data part of the block
  */
 void* FreeBlock::dataPosition() const {
-	return (void*) (this + sizeof(FreeBlock));
+	return (void*) ((char*)this + sizeof(FreeBlock));
 }
 /**
  * At first position of data part, there is a integer value which is the size of the object
@@ -41,6 +41,17 @@ int FreeBlock::getObjSize() const {
  */
 void* FreeBlock::getNextFreePointer() {
 	return (char*) dataPosition() + sizeof(int);
+}
+/*
+ * At second position of data part, there is a pointer to the next free block.
+ */
+void FreeBlock::setNextFreePointer(void* nextFree) {
+#if DEBUG
+	std::cout << "Setting next free pointer of (" << this << ") to (" << nextFree << ")" << std::endl;
+#endif
+	char* tmp = ((char*) dataPosition()) + sizeof(int);
+	// Set the address in tmp to nextFree
+	*(void**) tmp = nextFree;
 }
 
 FreeBlock* FreeBlock::getNextFree() {
