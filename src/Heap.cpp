@@ -7,7 +7,7 @@ Heap::Heap() {
 	this->heap_buffer = std::malloc(HEAP_SIZE);
 
 #if DEBUG
-	// Fill memory with 0xff (for debugging)
+	// Fill memory with 0xaa (for debugging)
 	for (int i = 0; i < HEAP_SIZE; ++i) {
 		((char*) heap_buffer)[i] = (char) 0xaa;
 	}
@@ -131,7 +131,7 @@ std::string Heap::ToString() {
 	std::string postfix;
 	std::string str = "Heap {\n";
 	str += "Heap dataSize: " + std::to_string(HEAP_SIZE) + "\n";
-	str += "Free bytes: " + std::to_string(free_bytes) + "\n";
+	str += "Free bytes: " + std::to_string(free_bytes) + " | Used bytes: " + std::to_string((HEAP_SIZE - free_bytes)) + "\n";
 	str += "Stored typeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
 
 	/*
