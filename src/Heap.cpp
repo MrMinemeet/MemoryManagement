@@ -141,17 +141,24 @@ std::string Heap::ToString() {
 	str += "Stored typeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
 
 	/*
-	 // FIXME: This currently causes some infinity loop
 	str += "Live blocks { ";
 	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
+	// FIXME: Results in  a SegFault when a block is allocated (e.g., executing line 34 in main.cpp)
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
+		int curBlkSize;
 		if (bCur->used) {
+			// Normal Block
 			str += "" + bCur->ToString() + postfix;
 			postfix = ", ";
+			curBlkSize = bCur->totalSize();
+		} else {
+			// FreeBlock
+			FreeBlock* fbCur = (FreeBlock*) bCur;
+			curBlkSize = fbCur->totalSize();
 		}
-		traversedSize += bCur->totalSize();
-		bCur = (Block*) ((char*) bCur + bCur->dataSize() + sizeof(Block));
+		traversedSize += curBlkSize;
+		bCur = (Block*) ((char*) bCur + curBlkSize);
 	}
 	str += " }\n";
 	 */
