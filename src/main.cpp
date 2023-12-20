@@ -34,6 +34,18 @@ int main() {
 	std::cout << blockFromTD->ToString() << std::endl;
 	std::cout << heap.ToString() << std::endl;
 
+	// Test allocating multiple blocks
+	std::cout << std::endl;
+	std::cout << "Allocating more 'SlideBlock'…" << std::endl;
+	for (int i = 0; i < 10; ++i) {
+		std::cout << std::endl;
+		std::cout << "Block number " << i << ":" << std::endl;
+		heap.alloc("SlideBlock");
+		std::cout << blockFromTD->ToString() << std::endl;
+	}
+	std::cout << heap.ToString() << std::endl;
+
+
 	/*
 	Block* a = heap.alloc(512);
 	Block* b = heap.alloc(400);
