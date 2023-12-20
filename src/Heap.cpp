@@ -179,7 +179,7 @@ std::string Heap::ToString() {
  * - a list of all pointers in this object (in hex form)
  *
  */
-void Heap::dump() {
+void Heap::dump() const {
 	std::cout << std::endl;
 	std::cout << "Dumping heap..." << std::endl;
 	std::string str = "Total bytes used: " + std::to_string(HEAP_SIZE - free_bytes) + "\n";
