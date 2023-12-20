@@ -75,3 +75,11 @@ int FreeBlock::headerSize() {
 int FreeBlock::dataSize() const {
 	return totalSize() - headerSize();
 }
+
+/**
+ * At the time of creating this method (20.12.2023 - 09:58), the size is 28 byte
+ * @return the minimum size of a free block with objSize and next-pointer
+ */
+long FreeBlock::getMinFreeBlockSize() {
+	return sizeof (FreeBlock) + sizeof(int) + sizeof(char*);
+}

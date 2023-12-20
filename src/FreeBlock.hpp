@@ -19,6 +19,7 @@ public:
 	int dataSize() const;
 	FreeBlock* getNextFree();
 	void* getNextFreePointer();
+	static long getMinFreeBlockSize();
 
 private:
 	void* dataPosition() const;
