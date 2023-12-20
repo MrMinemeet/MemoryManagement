@@ -19,7 +19,7 @@ int main() {
 	TypeDescriptor td = TypeDescriptor(16, new int[3]{0, 4, 12}, 3);
 	std::cout << td.ToString() << std::endl;
 #if DEBUG
-	if(heap.registerType("SlideBlock", td)) {
+	if (heap.registerType("SlideBlock", td)) {
 		std::cout << "Successfully registered typeDescriptor!" << std::endl;
 	} else {
 		std::cout << "Failed to register typeDescriptor!" << std::endl;
@@ -33,18 +33,21 @@ int main() {
 	std::cout << blockFromTD->ToString() << std::endl;
 	std::cout << heap.ToString() << std::endl;
 
-	/*
+
 	// Test allocating multiple blocks
 	std::cout << std::endl;
 	std::cout << "Allocating more 'SlideBlock'…" << std::endl;
-	for (int i = 0; i < 10; ++i) {
+	for (int i = 0; i < 2; ++i) {
 		std::cout << std::endl;
 		std::cout << "Block number " << i << ":" << std::endl;
 		heap.alloc("SlideBlock");
 		std::cout << blockFromTD->ToString() << std::endl;
 	}
 	std::cout << heap.ToString() << std::endl;
-	*/
+
+	// Test dump
+	std::cout << std::endl;
+	heap.dump();
 
 	/*
 	Block* a = heap.alloc(512);

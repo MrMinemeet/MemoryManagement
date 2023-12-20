@@ -8,17 +8,23 @@
 
 #include "FreeBlock.hpp"
 #include "TypeDescriptor.hpp"
+#include <iomanip>
 #include <iostream>
 #include <list>
+#include <sstream>
 
 class Heap {
 private:
 	// TODO: Adjust heap to 32 KiB for the final submission
-	const int HEAP_SIZE = 512; // as bytes
+	const int HEAP_SIZE = 512;// as bytes
 	void* heap_buffer;
 	uint free_bytes;
 	FreeBlock* fbHead;
 	std::unordered_map<std::string, TypeDescriptor*> type_map;
+	std::string getTypeDescriptorName(TypeDescriptor* typeDescriptor) const;
+	static std::string pointerToHexString(int* ptr);
+	static std::string charToHex(char c);
+
 
 public:
 	// Constructor

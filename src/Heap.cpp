@@ -174,23 +174,118 @@ std::string Heap::ToString() {
 }
 
 /**
- * Prints a list of all live objects as well as free blocks.
- * Print the total amount of memory used by live objects.
- * For every live object the following values should be printed:
- * - address (hex)
- * - name of the object's type
- * - the first 4 bytes of te object in hex form (to get a clue of the object's contents)
- * - a list of all pointers in this object (in hex form)
- *
+ * Prints a list of all live objects as well as free blocks. <br>
+ * <br>
+ * Print the total amount of memory used by live objects. <br>
+ * For every live object the following values should be printed: <br>
+ * - address (hex) <br>
+ * - name of the object's type <br>
+ * - the first 4 bytes of te object in hex form (to get a clue of the object's contents) <br>
+ * - a list of all pointers in this object (in hex form) <br>
+ * <br>
+ * Print the total amount of free memory. <br>
+ * For every free block the following values should be printed: <br>
+ * - address (hex) <br>
+ * - length (in bytes) <br>
  */
 void Heap::dump() const {
 	std::cout << std::endl;
 	std::cout << "Dumping heap..." << std::endl;
+	// Live Objects
 	std::string str = "Total bytes used: " + std::to_string(HEAP_SIZE - free_bytes) + "\n";
-	str += "Live objects: { ";
+	str += "Live objects: {\n";
+	std::string postfix;
+	int traversedSize = 0;
+	Block* bCur = (Block*) heap_buffer;
+	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
+		int curBlkSize;
+		if (bCur->used) {
+			// Normal Block
+			curBlkSize = bCur->totalSize();
+			char* data = (char*) bCur->getDataPart();
+			TypeDescriptor* type = bCur->typeDescriptor;
 
-	str += " }";
+			str += "\tBlock {\n";
+			str += "\t\tAddress: " + Heap::pointerToHexString((int*) bCur) + "\n";
+			str += "\t\tType: " + getTypeDescriptorName(type) + "\n";
+			str += "\t\tFirst 4 bytes: [ ";
+			for (int i = 0; i < 4; ++i) {
+				str += "0x" + Heap::charToHex(data[i]);
+				if (i < 3) {
+					str += ", ";
+				}
+			}
+			str += " ]\n";
+			str += "\t\tPointers: [ ";
+			for (int i = 0; i < type->offsetAmount; ++i) {
+				int* addr = (int*) ((char*) bCur + type->pointerOffsetArray[i]);
+				str += Heap::pointerToHexString(addr);
+				if (i < type->offsetAmount - 1) {
+					str += ", ";
+				}
+			}
+			str += " ]\n";
+			str += "\t}\n";
+		} else {
+			// FreeBlock
+			FreeBlock* fbCur = (FreeBlock*) bCur;
+			curBlkSize = fbCur->totalSize();
+		}
+		traversedSize += curBlkSize;
+		bCur = (Block*) ((char*) bCur + curBlkSize);
+	}
+	str += "}\n";
+
+	// Free Blocks
+	str += "Total free bytes: " + std::to_string(free_bytes) + "\n";
+	str += "Free blocks {\n";
+	FreeBlock* fbCur = fbHead;
+	while (fbCur != nullptr) {
+		str += "\tFreeBlock {\n";
+		str += "\t\tAddress: " + Heap::pointerToHexString((int*) fbCur) + "\n";
+		str += "\t\tLength: " + std::to_string(fbCur->totalSize()) + "\n";
+		str += "\t}\n";
+		fbCur = fbCur->getNextFree();
+	}
+	str += "}";
+
 	std::cout << str << std::endl;
 	std::cout << "Heap dumped!" << std::endl;
 	std::cout << std::endl;
+}
+
+/**
+ * Converts a pointer to a hex string.
+ * @param ptr The pointer to convert.
+ * @return The hex string.
+ */
+std::string Heap::pointerToHexString(int* ptr) {
+	std::stringstream ss;
+	ss << std::hex << (uintptr_t) ptr;
+	return "0x" + ss.str();
+}
+
+/**
+ * Converts a char to a hex string.
+ * @param c The char to convert.
+ * @return The hex string.
+ */
+std::string Heap::charToHex(char c) {
+	std::stringstream ss;
+	ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
+	return ss.str();
+}
+
+/**
+ * Returns the name of the typeDescriptor.
+ * @param typeDescriptor The typeDescriptor to get the name of.
+ * @return The name of the typeDescriptor.
+ */
+std::string Heap::getTypeDescriptorName(TypeDescriptor* typeDescriptor) const {
+	for (auto& it: type_map) {
+		if (it.second == typeDescriptor) {
+			return it.first;
+		}
+	}
+	return "NOT FOUND";
 }

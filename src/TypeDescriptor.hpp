@@ -4,12 +4,10 @@
 #include <string>
 
 class TypeDescriptor {
-	private:
-		int offsetAmount;
-
 	public:
 		int totalSize;
 		int* pointerOffsetArray;
+		int offsetAmount;
 
 		TypeDescriptor(int obj_size, int* pointer_offset_array, int offset_amount);  // Constructor declaration
 		~TypeDescriptor(); // Destructor declaration
