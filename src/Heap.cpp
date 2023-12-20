@@ -54,10 +54,9 @@ Block* Heap::alloc(const std::string& type) {
 		std::cerr << "No free block with enough space found!" << std::endl;
 		return nullptr;
 	}
-	// FIXME: Something here seems odd to me
 	// check if it is necessary/worth it to split the block
-	int newLength = cur->totalSize() - (requestedTotalSize + (int) sizeof(Block));
-	if (newLength < FreeBlock::getMinFreeBlockSize()) {
+	int leftOver = cur->totalSize() - requestedTotalSize;
+	if (leftOver < FreeBlock::getMinFreeBlockSize()) {
 #if DEBUG
 		std::cout << "Can't split free block any further!" << std::endl;
 #endif
@@ -76,7 +75,7 @@ Block* Heap::alloc(const std::string& type) {
 #endif
 		// Split
 		// Create a new FreeBlock after the allocated block
-		FreeBlock* newFreeBlock = new ((char*) cur + requestedTotalSize) FreeBlock(newLength - (int) sizeof(FreeBlock));
+		FreeBlock* newFreeBlock = new ((char*) cur + requestedTotalSize) FreeBlock(leftOver - (int) sizeof(FreeBlock));
 		// Set the next freeBlock of the new FreeBlock to the next free block of cur
 		*(FreeBlock**) newFreeBlock->getNextFreePointer() = cur->getNextFree();
 		// Set the nextFreeBlock of prev to the new FreeBlock
