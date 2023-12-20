@@ -13,7 +13,7 @@ Heap::Heap() {
 	}
 #endif
 
-	this->fbHead = new (heap_buffer) FreeBlock(HEAP_SIZE - sizeof(FreeBlock));// - sizeof(FreeBlock) because of the overhead
+	this->fbHead = new (heap_buffer) FreeBlock(HEAP_SIZE - (int) sizeof(FreeBlock));// - sizeof(FreeBlock) because of the overhead
 	this->free_bytes = HEAP_SIZE;
 
 	std::cout << "A new heap has been created!" << std::endl;
@@ -33,17 +33,17 @@ Block* Heap::alloc(const std::string& type) {
 		std::cerr << "Type " << type << " not found!" << std::endl;
 		return nullptr;
 	}
-	int dataSize = typeDescriptor->totalSize;
-	int totalSize = dataSize + sizeof(Block);
+	int requestedDataSize = typeDescriptor->totalSize;
+	int requestedTotalSize = requestedDataSize + (int) sizeof(Block);
 #if DEBUG
-	std::cout << "Allocating a total of " << totalSize << " bytes from heap for " << dataSize << " bytes of data…" << std::endl;
+	std::cout << "Allocating a total of " << requestedTotalSize << " bytes from heap for " << requestedDataSize << " bytes of data…" << std::endl;
 #endif
 
 	// Go through free list and find a free block with enough space
 	FreeBlock* cur = fbHead;
 	FreeBlock* prev = nullptr;
-	while(cur != nullptr) {
-		if (cur->totalSize() >= totalSize) {
+	while (cur != nullptr) {
+		if (cur->totalSize() >= requestedTotalSize) {
 			// Found a free block with enough space
 			break;
 		}
@@ -56,7 +56,7 @@ Block* Heap::alloc(const std::string& type) {
 	}
 	// FIXME: Something here seems odd to me
 	// check if it is necessary/worth it to split the block
-	int newLength = cur->totalSize() - (totalSize + sizeof(Block));
+	int newLength = cur->totalSize() - (requestedTotalSize + (int) sizeof(Block));
 	if (newLength < FreeBlock::getMinFreeBlockSize()) {
 #if DEBUG
 		std::cout << "Can't split free block any further!" << std::endl;
@@ -76,7 +76,7 @@ Block* Heap::alloc(const std::string& type) {
 #endif
 		// Split
 		// Create a new FreeBlock after the allocated block
-		FreeBlock* newFreeBlock = new ((char*) cur + totalSize) FreeBlock(newLength - sizeof(FreeBlock));
+		FreeBlock* newFreeBlock = new ((char*) cur + requestedTotalSize) FreeBlock(newLength - (int) sizeof(FreeBlock));
 		// Set the next freeBlock of the new FreeBlock to the next free block of cur
 		*(FreeBlock**) newFreeBlock->getNextFreePointer() = cur->getNextFree();
 		// Set the nextFreeBlock of prev to the new FreeBlock
@@ -93,7 +93,7 @@ Block* Heap::alloc(const std::string& type) {
 	Block* block = new (cur) Block(typeDescriptor);
 
 	// Adjust free_bytes
-	free_bytes -= totalSize;
+	free_bytes -= requestedTotalSize;
 
 	// Return the allocated block
 	return block;
@@ -114,7 +114,7 @@ void Heap::dealloc(Block* block) {
 		// add p to freelist
 	}
 
-	Block* right = (Block*) ((char*) p + p->dataSize() + sizeof(Block));
+	Block* right = (Block*) ((char*) p + p->dataSize() + (int) sizeof(Block));
 	if (!right->used) {
 		// remove right from freelist
 		// merge p and right
