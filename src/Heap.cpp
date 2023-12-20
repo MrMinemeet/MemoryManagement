@@ -141,6 +141,7 @@ std::string Heap::ToString() {
 	str += "Stored typeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
 
 	/*
+	 // FIXME: This currently causes some infinity loop
 	str += "Live blocks { ";
 	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
