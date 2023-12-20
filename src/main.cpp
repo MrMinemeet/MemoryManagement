@@ -15,11 +15,11 @@ int main() {
 	// TD based on "Garbage Collection" slide-set page 22
 	// Create TypeDescriptor for a class (Block x; Block y; int getDataPart; Block z;)
 	std::cout << std::endl;
-	std::cout << "Creating TypeDescriptor for class Block…" << std::endl;
+	std::cout << "Creating TypeDescriptor for class 'SlideBlock'…" << std::endl;
 	TypeDescriptor td = TypeDescriptor(20, new int[3]{0, 4, 12}, 3);
 	std::cout << td.ToString() << std::endl;
 #if DEBUG
-	if(heap.registerType("Block", td)) {
+	if(heap.registerType("SlideBlock", td)) {
 		std::cout << "Successfully registered typeDescriptor!" << std::endl;
 	} else {
 		std::cout << "Failed to register typeDescriptor!" << std::endl;
@@ -29,8 +29,8 @@ int main() {
 
 
 	std::cout << std::endl;
-	std::cout << "Allocating Block…" << std::endl;
-	Block* blockFromTD = heap.alloc("Block");
+	std::cout << "Allocating 'SlideBlock'…" << std::endl;
+	Block* blockFromTD = heap.alloc("SlideBlock");
 	std::cout << blockFromTD->ToString() << std::endl;
 	std::cout << heap.ToString() << std::endl;
 
