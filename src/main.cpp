@@ -27,13 +27,13 @@ int main() {
 	}
 #endif
 
-
 	std::cout << std::endl;
 	std::cout << "Allocating 'SlideBlock'…" << std::endl;
 	Block* blockFromTD = heap.alloc("SlideBlock");
 	std::cout << blockFromTD->ToString() << std::endl;
 	std::cout << heap.ToString() << std::endl;
 
+	/*
 	// Test allocating multiple blocks
 	std::cout << std::endl;
 	std::cout << "Allocating more 'SlideBlock'…" << std::endl;
@@ -44,7 +44,7 @@ int main() {
 		std::cout << blockFromTD->ToString() << std::endl;
 	}
 	std::cout << heap.ToString() << std::endl;
-
+	*/
 
 	/*
 	Block* a = heap.alloc(512);
