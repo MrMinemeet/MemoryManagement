@@ -14,7 +14,7 @@
 class Heap {
 private:
 	// TODO: Adjust heap to 32 KiB for the final submission
-	const uint HEAP_SIZE = 64; // as bytes
+	const int HEAP_SIZE = 64; // as bytes
 	void* heap_buffer;
 	uint free_bytes;
 	FreeBlock* fbHead;
@@ -31,7 +31,7 @@ public:
 	Block* alloc(const std::string& type);
 	void dealloc(Block* block);
 	bool registerType(const std::string& type, TypeDescriptor& descriptor);
-	void dump();
+	void dump() const;
 	std::string ToString();
 };
 

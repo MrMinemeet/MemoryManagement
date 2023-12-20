@@ -13,7 +13,7 @@
 class FreeBlock : public Block {
 public:
 	FreeBlock(int requestedSize);
-	std::string ToString();
+	std::string ToString() const;
 	int totalSize() const;
 	static int headerSize();
 	int dataSize() const;

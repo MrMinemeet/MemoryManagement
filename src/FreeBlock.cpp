@@ -6,8 +6,8 @@
 #include "Declarations.hpp"
 #include <iostream>
 
-FreeBlock::FreeBlock(int requestedSize) : Block(typeDescriptor) {
-	int actualSize = requestedSize + sizeof(FreeBlock);
+FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null here, and set further below. Otherwise, the debug info would overwrite it.
+	int actualSize = requestedSize + (int) sizeof(FreeBlock);
 #if DEBUG
 	// Fill memory with 0x01 (to mark as free)
 	for (int i = 0; i < actualSize; ++i) {
@@ -28,7 +28,7 @@ FreeBlock::FreeBlock(int requestedSize) : Block(typeDescriptor) {
  * Returns the data part of the block
  */
 void* FreeBlock::dataPosition() const {
-	return (void*) ((char*)this + sizeof(FreeBlock));
+	return (void*) ((char*) this + sizeof(FreeBlock));
 }
 /**
  * At first position of data part, there is a integer value which is the size of the object
@@ -65,7 +65,7 @@ FreeBlock* FreeBlock::getNextFree() {
 	return *(FreeBlock**) getNextFreePointer();
 }
 
-std::string FreeBlock::ToString() {
+std::string FreeBlock::ToString() const {
 	std::string str = "FreeBlock { ";
 	str += "totalSize: " + std::to_string(totalSize()) + ", ";
 	str += "headerSize: " + std::to_string(headerSize()) + ", ";
@@ -88,5 +88,5 @@ int FreeBlock::dataSize() const {
  * @return the minimum size of a free block with objSize and next-pointer
  */
 long FreeBlock::getMinFreeBlockSize() {
-	return sizeof (FreeBlock) + sizeof(int) + sizeof(char*);
+	return sizeof(FreeBlock) + sizeof(int) + sizeof(char*);
 }
