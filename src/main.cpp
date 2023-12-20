@@ -16,7 +16,7 @@ int main() {
 	// Create TypeDescriptor for a class (Block x; Block y; int getDataPart; Block z;)
 	std::cout << std::endl;
 	std::cout << "Creating TypeDescriptor for class 'SlideBlock'…" << std::endl;
-	TypeDescriptor td = TypeDescriptor(20, new int[3]{0, 4, 12}, 3);
+	TypeDescriptor td = TypeDescriptor(16, new int[3]{0, 4, 12}, 3);
 	std::cout << td.ToString() << std::endl;
 #if DEBUG
 	if(heap.registerType("SlideBlock", td)) {

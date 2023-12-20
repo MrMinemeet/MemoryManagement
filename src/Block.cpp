@@ -1,5 +1,6 @@
 #include "Block.hpp"
 
+#include "Declarations.hpp"
 
 /*
  * Takes 16 bytes in memory
@@ -8,6 +9,16 @@
  * 7 bytes padding
  */
 Block::Block(TypeDescriptor* typeDescriptor) {
+#if DEBUG
+	// Fill memory with 0x02 (for debugging)
+	if (typeDescriptor != nullptr) {
+		int totalSize = typeDescriptor->totalSize;
+		for (int i = 0; i < totalSize + sizeof(Block); ++i) {
+			((char*) this)[i] = (char) 0x02;
+		}
+	}
+#endif
+
 	this->typeDescriptor = typeDescriptor;
 	this->used = true;
 }
@@ -28,7 +39,7 @@ void* Block::getDataPart() {
 }
 
 int Block::totalSize() const {
-	return typeDescriptor->totalSize;
+	return typeDescriptor->totalSize + (int) sizeof(Block);
 }
 
 int Block::headerSize() {
@@ -36,7 +47,7 @@ int Block::headerSize() {
 }
 
 int Block::dataSize() const {
-	return totalSize() - headerSize();
+	return typeDescriptor->totalSize;
 }
 
 std::string Block::ToString() const {

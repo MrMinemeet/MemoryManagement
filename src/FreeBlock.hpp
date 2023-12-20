@@ -20,12 +20,12 @@ public:
 	FreeBlock* getNextFree();
 	void* getNextFreePointer();
 	static long getMinFreeBlockSize();
+	void setNextFreePointer(void* nextFree);
+	void setObjSize(int size);
 
 private:
 	void* dataPosition() const;
 	int getObjSize() const;
-	void setNextFreePointer(void* nextFree);
-	void setObjSize(int size);
 };
 
 

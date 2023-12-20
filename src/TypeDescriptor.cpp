@@ -1,6 +1,9 @@
 #include "TypeDescriptor.hpp"
 
-// Define member functions for the TypeDescriptor class here, if needed
+/*
+ * Define member functions for the TypeDescriptor class here, if needed.
+ * The "obj_size" does not include the pointer size to the type descriptor. (This is different from what the slide-set 2 on p.22 says
+ */
 TypeDescriptor::TypeDescriptor(int obj_size, int pointer_offset_array[], int offset_amount) {
     // Constructor implementation
     this->totalSize = obj_size;

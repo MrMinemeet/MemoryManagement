@@ -77,7 +77,7 @@ Block* Heap::alloc(const std::string& type) {
 		// Create a new FreeBlock after the allocated block
 		FreeBlock* newFreeBlock = new ((char*) cur + requestedTotalSize) FreeBlock(leftOver - (int) sizeof(FreeBlock));
 		// Set the next freeBlock of the new FreeBlock to the next free block of cur
-		*(FreeBlock**) newFreeBlock->getNextFreePointer() = cur->getNextFree();
+		newFreeBlock->setNextFreePointer(cur->getNextFree());
 		// Set the nextFreeBlock of prev to the new FreeBlock
 		if (prev == nullptr) {
 			// cur is the head of the free list, set the new FreeBlock as the new head
@@ -140,7 +140,6 @@ std::string Heap::ToString() {
 	str += "Free bytes: " + std::to_string(free_bytes) + " | Used bytes: " + std::to_string((HEAP_SIZE - free_bytes)) + "\n";
 	str += "Stored typeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
 
-	/*
 	str += "Live blocks { ";
 	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
@@ -161,7 +160,6 @@ std::string Heap::ToString() {
 		bCur = (Block*) ((char*) bCur + curBlkSize);
 	}
 	str += " }\n";
-	 */
 
 	str += "Free blocks { ";
 	FreeBlock* fbCur = fbHead;
