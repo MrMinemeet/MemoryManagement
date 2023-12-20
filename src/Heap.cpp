@@ -143,7 +143,6 @@ std::string Heap::ToString() {
 	str += "Live blocks { ";
 	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
-	// FIXME: Results in  a SegFault when a block is allocated (e.g., executing line 34 in main.cpp)
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
 		int curBlkSize;
 		if (bCur->used) {
