@@ -8,7 +8,6 @@ class Block {
 public:
 	// Heap
 	TypeDescriptor* typeDescriptor;
-	bool used;
 
 	// GC
 	/*
@@ -24,6 +23,7 @@ public:
 
 	// Additional member function declarations, if needed
 	std::string ToString() const;
+	bool isFreeBlock();
 
 	/**
 	* Returns the getDataPart pointer of this block.

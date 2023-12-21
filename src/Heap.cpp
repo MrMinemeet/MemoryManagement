@@ -149,7 +149,7 @@ std::string Heap::ToString() {
 	Block* bCur = (Block*) heap_buffer;
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
 		int curBlkSize;
-		if (bCur->used) {
+		if (bCur->isFreeBlock()) {
 			// Normal Block
 			str += "" + bCur->ToString() + postfix;
 			postfix = ", ";
@@ -203,7 +203,7 @@ void Heap::dump() const {
 	Block* bCur = (Block*) heap_buffer;
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
 		int curBlkSize;
-		if (bCur->used) {
+		if (bCur->isFreeBlock()) {
 			// Normal Block
 			curBlkSize = bCur->totalSize();
 			char* data = (char*) bCur->getDataPart();

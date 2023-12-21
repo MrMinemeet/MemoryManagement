@@ -3,8 +3,6 @@
 
 #include "Block.hpp"
 
-
-
 /**
  * "A special "Block" that is used to mark free memory.
  * The "typeDescriptor" points to the data part of the block.
@@ -22,9 +20,9 @@ public:
 	static long getMinFreeBlockSize();
 	void setNextFreePointer(void* nextFree);
 	void setObjSize(int size);
+	void* dataPosition() const;
 
 private:
-	void* dataPosition() const;
 	int getObjSize() const;
 };
 

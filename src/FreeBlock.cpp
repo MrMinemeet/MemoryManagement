@@ -15,7 +15,6 @@ FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null her
 	}
 #endif
 
-	this->used = false;
 	// typeDescriptor is a pointer to the data part of the free block
 	this->typeDescriptor = (TypeDescriptor*) dataPosition();
 	// Size of the data part of the whole free block
