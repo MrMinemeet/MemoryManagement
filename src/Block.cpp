@@ -1,6 +1,7 @@
 #include "Block.hpp"
 
 #include "Declarations.hpp"
+#include "FreeBlock.hpp"
 
 /*
  * Takes 16 bytes in memory
@@ -20,7 +21,6 @@ Block::Block(TypeDescriptor* typeDescriptor) {
 #endif
 
 	this->typeDescriptor = typeDescriptor;
-	this->used = true;
 }
 
 Block::~Block() = default;
@@ -30,12 +30,12 @@ Block::~Block() = default;
  * If the block is not marked as "used", then a nullptr is returned
  */
 void* Block::getDataPart() {
-	if (!this->used) {
+	if (isFreeBlock()) {
 		return nullptr;
 	}
 
 	// "this + sizeof(Block)" is the effective getDataPart for the block
-	return this + sizeof (Block);
+	return this + sizeof(Block);
 }
 
 int Block::totalSize() const {
@@ -52,14 +52,22 @@ int Block::dataSize() const {
 
 std::string Block::ToString() const {
 	std::string str = "Block { ";
-	if (this->used) {
-		str += "used: true, ";
-	} else {
-		str += "used: false, ";
-	}
+	str += "used: true, ";
 	str += "totalSize: " + std::to_string(totalSize()) + ", ";
 	str += "headerSize: " + std::to_string(headerSize()) + ", ";
 	str += "dataSize: " + std::to_string(dataSize());
 	str += "}";
 	return str;
+}
+
+
+/**
+ * Takes a block and checks if it is a FreeBlock. <br>
+ * The function checks if the TypeDescriptor points to the body of the block
+ * @param blk The body to check
+ * @return True if the block is a FreeBlock, otherwise false
+ */
+bool Block::isFreeBlock() {
+	FreeBlock* fb = (FreeBlock*) this;
+	return (void*) fb->typeDescriptor == fb->dataPosition();
 }
