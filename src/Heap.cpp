@@ -98,6 +98,9 @@ Block* Heap::alloc(const std::string& type) {
 	return block;
 }
 
+/*
+// Commented out, as I think this is not actually needed.
+// The GC should perform deallocate of unused blocks in a more general context.
 void Heap::dealloc(Block* block) {
 	std::cout << "Deallocating memory..." << std::endl;
 
@@ -121,6 +124,7 @@ void Heap::dealloc(Block* block) {
 
 	// Implement the reallocation logic here
 }
+*/
 
 /// Register a typeDescriptor with the Heap. Will return true if the typeDescriptor was successfully registered, false otherwise.
 bool Heap::registerType(const std::string& type, TypeDescriptor& descriptor) {

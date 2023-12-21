@@ -35,7 +35,7 @@ public:
 
 	// Methods
 	Block* alloc(const std::string& type);
-	void dealloc(Block* block);
+	//void dealloc(Block* block);
 	bool registerType(const std::string& type, TypeDescriptor& descriptor);
 	void dump() const;
 	std::string ToString();
