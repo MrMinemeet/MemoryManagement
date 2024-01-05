@@ -18,14 +18,12 @@ int main() {
 	std::cout << "Creating TypeDescriptor for class 'SlideBlock'…" << std::endl;
 	TypeDescriptor td = TypeDescriptor(16, new int[3]{0, 4, 12}, 3);
 	std::cout << td.ToString() << std::endl;
-#if DEBUG
 	if (heap.registerType("SlideBlock", td)) {
 		std::cout << "Successfully registered typeDescriptor!" << std::endl;
 	} else {
 		std::cout << "Failed to register typeDescriptor!" << std::endl;
 		return 1;
 	}
-#endif
 
 	std::cout << std::endl;
 	std::cout << "Allocating 'SlideBlock'…" << std::endl;
