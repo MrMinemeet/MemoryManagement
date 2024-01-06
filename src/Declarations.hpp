@@ -7,7 +7,10 @@
 /*
  * FIXME: Enabling this causes a segfault in Heap Line 18.
  * There the "fb-ToString()" causes some weird behaviour.
+ * In general it seems kind of random when the segfault occurs.
+ * It happens more often with the DEBUG flag enabled.
+ * I don't know why this happens, maybe you can figure it out :)
 */
-#define DEBUG true
+#define DEBUG false
 
 #endif
