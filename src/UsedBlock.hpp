@@ -7,6 +7,7 @@
 
 
 #include "Block.hpp"
+#include "Declarations.hpp"
 
 /*
  * A special "Block" that is used to mark used memory.

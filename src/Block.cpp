@@ -1,6 +1,5 @@
 #include "Block.hpp"
 
-#include "Declarations.hpp"
 #include "FreeBlock.hpp"
 
 /*
@@ -8,16 +7,6 @@
  * The rest depends on if it is a used or free block
  */
 Block::Block(TypeDescriptor* typeDescriptor) {
-#if DEBUG
-	// Fill memory with 0x02 (for debugging)
-	if (typeDescriptor != nullptr) {
-		int totalSize = typeDescriptor->totalSize;
-		for (int i = 0; i < totalSize + sizeof(Block); ++i) {
-			((char*) this)[i] = (char) 0x02;
-		}
-	}
-#endif
-
 	this->typeDescriptor = typeDescriptor;
 }
 
