@@ -1,5 +1,4 @@
 #include "Heap.hpp"// Include the corresponding header file
-#include "Block.hpp"
 
 
 // Define the member functions of the Heap class here
@@ -27,7 +26,7 @@ Heap::~Heap() {
 /*
  * Takes a chunk of size "sizeof(Block) + type.totalSize" from heap and return Block pointer
  */
-Block* Heap::alloc(const std::string& type) {
+UsedBlock* Heap::alloc(const std::string& type) {
 	TypeDescriptor* typeDescriptor = type_map[type];
 	if (typeDescriptor == nullptr) {
 		std::cerr << "Type " << type << " not found!" << std::endl;
@@ -89,7 +88,7 @@ Block* Heap::alloc(const std::string& type) {
 	}
 
 	// Set the typeDescriptor of the allocated block
-	Block* block = new (cur) Block(typeDescriptor);
+	UsedBlock* block = new (cur) UsedBlock(typeDescriptor);
 
 	// Adjust free_bytes
 	free_bytes -= requestedTotalSize;
@@ -150,10 +149,11 @@ std::string Heap::ToString() {
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
 		int curBlkSize;
 		if (!bCur->isFreeBlock()) {
-			// Normal Block
-			str += "" + bCur->ToString() + postfix;
+			// UsedBlock
+			UsedBlock* ubCur = (UsedBlock*) bCur;
+			str += "" + ubCur->ToString() + postfix;
 			postfix = ", ";
-			curBlkSize = bCur->totalSize();
+			curBlkSize = ubCur->totalSize();
 		} else {
 			// FreeBlock
 			FreeBlock* fbCur = (FreeBlock*) bCur;
@@ -204,13 +204,14 @@ void Heap::dump() const {
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
 		int curBlkSize;
 		if (!bCur->isFreeBlock()) {
-			// Normal Block
-			curBlkSize = bCur->totalSize();
-			char* data = (char*) bCur->getDataPart();
-			TypeDescriptor* type = bCur->typeDescriptor;
+			// UsedBlock
+			UsedBlock* ubCur = (UsedBlock*) bCur;
+			curBlkSize = ubCur->totalSize();
+			char* data = (char*) ubCur->getDataPart();
+			TypeDescriptor* type = ubCur->typeDescriptor;
 
 			str += "\tBlock {\n";
-			str += "\t\tAddress: " + Heap::pointerToHexString((int*) bCur) + "\n";
+			str += "\t\tAddress: " + Heap::pointerToHexString((int*) ubCur) + "\n";
 			str += "\t\tType: " + getTypeDescriptorName(type) + "\n";
 			str += "\t\tFirst 4 bytes: [ ";
 			for (int i = 0; i < 4; ++i) {
@@ -222,7 +223,7 @@ void Heap::dump() const {
 			str += " ]\n";
 			str += "\t\tPointers: [ ";
 			for (int i = 0; i < type->offsetAmount; ++i) {
-				int* addr = (int*) ((char*) bCur + type->pointerOffsetArray[i]);
+				int* addr = (int*) ((char*) ubCur + type->pointerOffsetArray[i]);
 				str += Heap::pointerToHexString(addr);
 				if (i < type->offsetAmount - 1) {
 					str += ", ";
