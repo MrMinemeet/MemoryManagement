@@ -6,7 +6,15 @@
 #include "Declarations.hpp"
 #include <iostream>
 
+/*
+ * Takes 20 bytes in memory:
+ * - 8 bytes for the typeDescriptor pointer (Actual head)
+ * - 4 bytes for the size of the data part (Data Part)
+ * - 8 bytes for the pointer to the next free block (Data Part)
+ * The rest of the data part until the next block is not used for anything specifically at the moment and just sits around.
+ */
 FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null here, and set further below. Otherwise, the debug info would overwrite it.
+
 	int actualSize = requestedSize + (int) sizeof(FreeBlock);
 #if DEBUG
 	// Fill memory with 0x01 (to mark as free)
@@ -18,7 +26,7 @@ FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null her
 	// typeDescriptor is a pointer to the data part of the free block
 	this->typeDescriptor = (TypeDescriptor*) dataPosition();
 	// Size of the data part of the whole free block
-	this->setObjSize((int) sizeof(FreeBlock) + requestedSize);
+	this->setObjSize(actualSize);
 	// Pointer to the next free block, which is nullptr per default
 	setNextFreePointer(nullptr);
 }
@@ -48,9 +56,6 @@ void FreeBlock::setObjSize(int size) {
 void* FreeBlock::getNextFreePointer() {
 	return (char*) dataPosition() + sizeof(int);
 }
-/*
- * At second position of data part, there is a pointer to the next free block.
- */
 void FreeBlock::setNextFreePointer(void* nextFree) {
 #if DEBUG
 	std::cout << "Setting next free pointer of (" << this << ") to (" << nextFree << ")" << std::endl;
@@ -60,6 +65,9 @@ void FreeBlock::setNextFreePointer(void* nextFree) {
 	*(void**) tmp = nextFree;
 }
 
+/**
+ * @return nullptr if this is the last free block
+ */
 FreeBlock* FreeBlock::getNextFree() {
 	return *(FreeBlock**) getNextFreePointer();
 }

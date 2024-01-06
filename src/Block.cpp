@@ -4,10 +4,8 @@
 #include "FreeBlock.hpp"
 
 /*
- * Takes 16 bytes in memory
- * 1 byte for the used flag
- * 8 bytes for the typeDescriptor pointer
- * 7 bytes padding
+ * The head takes 8 bytes in memory for the typeDescriptor pointer.
+ * The rest until the next block is the data part. which depends on the typeDescriptor
  */
 Block::Block(TypeDescriptor* typeDescriptor) {
 #if DEBUG
