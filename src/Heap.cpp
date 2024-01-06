@@ -15,7 +15,10 @@ Heap::Heap() {
 	this->fbHead = new (heap_buffer) FreeBlock(HEAP_SIZE - (int) sizeof(FreeBlock));// - sizeof(FreeBlock) because of the overhead
 	this->free_bytes = HEAP_SIZE;
 
+	std::cout << fbHead->ToString() << std::endl;
+
 	std::cout << "A new heap has been created!" << std::endl;
+
 }
 
 Heap::~Heap() {
@@ -147,8 +150,8 @@ std::string Heap::ToString() {
 	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
-		int curBlkSize;
-		if (!bCur->isFreeBlock()) {
+		int curBlkSize = 0;
+ 		if (!bCur->isFreeBlock()) {
 			// UsedBlock
 			UsedBlock* ubCur = (UsedBlock*) bCur;
 			str += "" + ubCur->ToString() + postfix;
@@ -157,7 +160,8 @@ std::string Heap::ToString() {
 		} else {
 			// FreeBlock
 			FreeBlock* fbCur = (FreeBlock*) bCur;
-			curBlkSize = fbCur->totalSize();
+			FreeBlock cur = *fbCur;
+			curBlkSize = cur.totalSize();
 		}
 		traversedSize += curBlkSize;
 		bCur = (Block*) ((char*) bCur + curBlkSize);
@@ -210,7 +214,7 @@ void Heap::dump() const {
 			char* data = (char*) ubCur->getDataPart();
 			TypeDescriptor* type = ubCur->typeDescriptor;
 
-			str += "\tBlock {\n";
+			str += "\tUsed Block {\n";
 			str += "\t\tAddress: " + Heap::pointerToHexString((int*) ubCur) + "\n";
 			str += "\t\tType: " + getTypeDescriptorName(type) + "\n";
 			str += "\t\tFirst 4 bytes: [ ";

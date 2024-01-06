@@ -43,7 +43,7 @@ std::string Block::ToString() const {
  */
 bool Block::isFreeBlock() const {
 	FreeBlock* fb = (FreeBlock*) this;
-	return (void*) fb->typeDescriptor == fb->getDataPart();
+	return (void*) fb->typeDescriptor == fb->dataPosition();
 }
 void* Block::getDataPart() const {
 	// "this + sizeof(Block)" is the effective getDataPart for the block

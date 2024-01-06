@@ -20,7 +20,7 @@ public:
 	Block(TypeDescriptor* typeDescriptor);
 
 	// Additional member function declarations, if needed
-	std::string ToString() const;
+	virtual std::string ToString() const;
 	bool isFreeBlock() const;
 
 	/**

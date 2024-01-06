@@ -13,7 +13,7 @@ public:
 	FreeBlock(int requestedSize);
 
 	// Additional member function declarations, if needed
-	std::string ToString() const;
+	std::string ToString() const override;
 
 	int totalSize() const override;
 	int headerSize() const override;
@@ -23,11 +23,11 @@ public:
 	void* getNextFreePointer();
 	static long getMinFreeBlockSize();
 	void setNextFreePointer(void* nextFree);
+	void* dataPosition() const;
 
 private:
 	int getObjSize() const;
 	void setObjSize(int size);
-	void* dataPosition() const;
 };
 
 
