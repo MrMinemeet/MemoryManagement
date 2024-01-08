@@ -16,25 +16,23 @@ public:
 	Block* right;
 	*/
 
-	// Constructor declaration
+	// Constructor
 	Block(TypeDescriptor* typeDescriptor);
-	// Destructor declaration
-	~Block();
 
 	// Additional member function declarations, if needed
-	std::string ToString() const;
-	bool isFreeBlock();
+	virtual std::string ToString() const;
+	bool isFreeBlock() const;
 
 	/**
 	* Returns the getDataPart pointer of this block.
 	* @return the getDataPart pointer of this block.
 	* @return nullptr if this block is free.
 	*/
-	void* getDataPart();
+	virtual void* getDataPart() const;
 
-	int totalSize() const;
-	static int headerSize();
-	int dataSize() const;
+	virtual int totalSize() const;
+	virtual int headerSize() const;
+	virtual int dataSize() const;
 };
 
 #endif// BLOCK_HPP

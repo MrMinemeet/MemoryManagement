@@ -11,10 +11,9 @@
  * - 8 bytes for the typeDescriptor pointer (Actual head)
  * - 4 bytes for the size of the data part (Data Part)
  * - 8 bytes for the pointer to the next free block (Data Part)
- * The rest of the data part until the next block is not used for anything specifically at the moment and just sits around.
+ * The rest of the data part until the next block is not used for anything specifically and just sits around until the free block is (partially) allocated.
  */
 FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null here, and set further below. Otherwise, the debug info would overwrite it.
-
 	int actualSize = requestedSize + (int) sizeof(FreeBlock);
 #if DEBUG
 	// Fill memory with 0x01 (to mark as free)
@@ -24,19 +23,13 @@ FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null her
 #endif
 
 	// typeDescriptor is a pointer to the data part of the free block
-	this->typeDescriptor = (TypeDescriptor*) dataPosition();
+	this->typeDescriptor = (TypeDescriptor*) ((char*) this + sizeof(FreeBlock)); // Explicitly written in order to avoid virtual function calls in constructor
 	// Size of the data part of the whole free block
 	this->setObjSize(actualSize);
 	// Pointer to the next free block, which is nullptr per default
 	setNextFreePointer(nullptr);
 }
 
-/**
- * Returns the data part of the block
- */
-void* FreeBlock::dataPosition() const {
-	return (void*) ((char*) this + sizeof(FreeBlock));
-}
 /**
  * At first position of data part, there is a integer value which is the size of the object
  */
@@ -83,7 +76,7 @@ std::string FreeBlock::ToString() const {
 int FreeBlock::totalSize() const {
 	return getObjSize();
 }
-int FreeBlock::headerSize() {
+int FreeBlock::headerSize() const {
 	return sizeof(FreeBlock);
 }
 int FreeBlock::dataSize() const {
@@ -96,4 +89,7 @@ int FreeBlock::dataSize() const {
  */
 long FreeBlock::getMinFreeBlockSize() {
 	return sizeof(FreeBlock) + sizeof(int) + sizeof(char*);
+}
+void* FreeBlock::dataPosition() const {
+	return (void*) ((char*) this + sizeof(FreeBlock));
 }
