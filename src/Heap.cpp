@@ -290,3 +290,38 @@ std::string Heap::getTypeDescriptorName(TypeDescriptor* typeDescriptor) const {
 	}
 	return "NOT FOUND";
 }
+
+/**
+ * Invoke the Deutsch-Schorr-Waite garbage collector algorithm.
+ * The root is an array of root pointers with a null value as termination.
+ * @param array of root pointers
+ */
+void Heap::gc(void** rootPointers) {
+	// ---- Mark Phase
+
+	// Loop through all root pointers
+	for(int i = 0; rootPointers[i] != nullptr; ++i) {
+		// Run Marking starting from that root pointer
+		void* rootPointer = rootPointers[i];
+		mark((Block*)rootPointer);
+	}
+
+	// ---- Sweep Phase
+
+}
+
+/**
+ * Marks objects that can be (in-)directly reached from the roots.
+ * The marking is performed on the LSB of the TypeDescriptor address.
+ * @param rootPointer to start marking from
+ */
+void Heap::mark(Block* rootPointer) {
+
+}
+
+/**
+ * Builds a new freelist and merge adjacent free blocks
+ */
+void Heap::sweep() {
+
+}

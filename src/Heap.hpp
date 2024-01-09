@@ -26,6 +26,9 @@ private:
 	static std::string pointerToHexString(int* ptr);
 	static std::string charToHex(char c);
 
+	void mark(Block* rootPointer);
+	void sweep();
+
 
 public:
 	// Constructor
@@ -40,6 +43,10 @@ public:
 	bool registerType(const std::string& type, TypeDescriptor& descriptor);
 	void dump() const;
 	std::string ToString();
+
+	void gc(void** rootPointers);
+
+
 };
 
 #endif// HEAP_HPP
