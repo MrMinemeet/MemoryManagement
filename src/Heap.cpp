@@ -150,21 +150,13 @@ std::string Heap::ToString() {
 	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
 	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
-		int curBlkSize = 0;
  		if (!bCur->isFreeBlock()) {
 			// UsedBlock
-			UsedBlock* ubCur = (UsedBlock*) bCur;
-			str += "" + ubCur->ToString() + postfix;
+			str += "" + bCur->ToString() + postfix;
 			postfix = ", ";
-			curBlkSize = ubCur->totalSize();
-		} else {
-			// FreeBlock
-			FreeBlock* fbCur = (FreeBlock*) bCur;
-			FreeBlock cur = *fbCur;
-			curBlkSize = cur.totalSize();
 		}
-		traversedSize += curBlkSize;
-		bCur = (Block*) ((char*) bCur + curBlkSize);
+		traversedSize += bCur->totalSize();
+		bCur = (Block*) ((char*) bCur + bCur->totalSize());
 	}
 	str += " }\n";
 
