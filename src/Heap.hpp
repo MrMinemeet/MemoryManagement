@@ -26,6 +26,7 @@ private:
 	static std::string pointerToHexString(int* ptr);
 	static std::string charToHex(char c);
 
+	// ---- Garbage Collection
 	void mark(Block* rootPointer);
 	void sweep();
 
@@ -44,9 +45,8 @@ public:
 	void dump() const;
 	std::string ToString();
 
+	// ---- Garbage Collection
 	void gc(void** rootPointers);
-
-
 };
 
 #endif// HEAP_HPP

@@ -5,9 +5,10 @@
 #include <string>
 
 class Block {
-public:
-	// Heap
+private:
 	TypeDescriptor* typeDescriptor;
+
+public:
 
 	// GC
 	/*
@@ -22,6 +23,7 @@ public:
 	// Additional member function declarations, if needed
 	virtual std::string ToString() const;
 	bool isFreeBlock() const;
+	bool isMarked() const;
 
 	/**
 	* Returns the getDataPart pointer of this block.
@@ -29,6 +31,8 @@ public:
 	* @return nullptr if this block is free.
 	*/
 	virtual void* getDataPart() const;
+	virtual TypeDescriptor* getTypeDescriptor() const;
+	virtual void setTypeDescriptor(TypeDescriptor* descriptor);
 
 	virtual int totalSize() const;
 	virtual int headerSize() const;

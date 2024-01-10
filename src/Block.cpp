@@ -48,3 +48,32 @@ int Block::headerSize() const {
 int Block::dataSize() const {
 	return typeDescriptor->totalSize;
 }
+
+/**
+ * Checks for the Mark-Bit in the type descriptor.
+ * @return  If the LSB is 1 it is marked and true is returned., otherwise returns false
+ */
+bool Block::isMarked() const {
+	void* idk = typeDescriptor;
+	// Check if the lsb is a 1 or a 0
+	ulong maskedAddress = ((uintptr_t) typeDescriptor & 1);
+	return maskedAddress == 1;
+}
+
+/**
+ * Getter which does not include the Mark bit, which is stored in the type descriptor
+ * @return The sanitized TypeDescriptor pointer
+ */
+TypeDescriptor* Block::getTypeDescriptor() const {
+	// Remove the LSB from the typeDescriptor pointer
+	// TODO: Do this in a nice way
+	return (TypeDescriptor*) (((uintptr_t) typeDescriptor >> 1) << 1);
+}
+
+/**
+ * Sets the passed value as the new type descriptor
+ * @param descriptor The new type descriptor
+ */
+void Block::setTypeDescriptor(TypeDescriptor* descriptor) {
+	typeDescriptor = descriptor;
+}

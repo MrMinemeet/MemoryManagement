@@ -23,7 +23,7 @@ FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null her
 #endif
 
 	// typeDescriptor is a pointer to the data part of the free block
-	this->typeDescriptor = (TypeDescriptor*) ((char*) this + sizeof(FreeBlock)); // Explicitly written in order to avoid virtual function calls in constructor
+	this->setTypeDescriptor((TypeDescriptor*) ((char*) this + sizeof(FreeBlock))); // Explicitly written in order to avoid virtual function calls in constructor
 	// Size of the data part of the whole free block
 	this->setObjSize(actualSize);
 	// Pointer to the next free block, which is nullptr per default

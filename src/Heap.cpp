@@ -204,7 +204,7 @@ void Heap::dump() const {
 			UsedBlock* ubCur = (UsedBlock*) bCur;
 			curBlkSize = ubCur->totalSize();
 			char* data = (char*) ubCur->getDataPart();
-			TypeDescriptor* type = ubCur->typeDescriptor;
+			TypeDescriptor* type = ubCur->getTypeDescriptor();
 
 			str += "\tUsed Block {\n";
 			str += "\t\tAddress: " + Heap::pointerToHexString((int*) ubCur) + "\n";
@@ -316,7 +316,10 @@ void Heap::gc(void** rootPointers) {
  * @param rootPointer to start marking from
  */
 void Heap::mark(Block* rootPointer) {
-
+	// Skip if no valid pointer or was already checked
+	if(rootPointer == nullptr || rootPointer->isMarked()) {
+		return;
+	}
 }
 
 /**
