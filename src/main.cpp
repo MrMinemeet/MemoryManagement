@@ -47,6 +47,19 @@ int main() {
 	std::cout << std::endl;
 	heap.dump();
 
+	// Test garbage collection
+	std::cout << std::endl;
+	std::cout << "Testing garbage collection…" << std::endl;
+	// Generate root pointer array
+	Block** rootPointers = new Block*[2];
+	rootPointers[0] = blockFromTD;
+	rootPointers[1] = nullptr;
+	heap.gc((void**)&blockFromTD);
+	heap.dump();
+
+	// free rootPointer array (otherwise the array leaks)
+	delete[] rootPointers;
+
 	/*
 	Block* a = heap.alloc(512);
 	Block* b = heap.alloc(400);
