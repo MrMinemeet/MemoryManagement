@@ -209,6 +209,7 @@ void Heap::dump() const {
 			str += "\tUsed Block {\n";
 			str += "\t\tAddress: " + Heap::pointerToHexString((int*) ubCur) + "\n";
 			str += "\t\tType: " + getTypeDescriptorName(type) + "\n";
+			str += "\t\tIs marked: " + boolToString(ubCur->isMarked()) + "\n"; // This was not requested but I found it very helpful
 			str += "\t\tFirst 4 bytes: [ ";
 			for (int i = 0; i < 4; ++i) {
 				str += "0x" + Heap::charToHex(data[i]);
@@ -275,6 +276,15 @@ std::string Heap::charToHex(char c) {
 	std::stringstream ss;
 	ss << std::hex << std::setw(2) << std::setfill('0') << static_cast<int>(c);
 	return ss.str();
+}
+
+/**
+ * Converts a bool to a string.
+ * @param b The bool to convert.
+ * @return "true" if b is true, "false" otherwise.
+ */
+std::string Heap::boolToString(bool b) {
+	return b ? "true" : "false";
 }
 
 /**

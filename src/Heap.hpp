@@ -25,6 +25,7 @@ private:
 	std::string getTypeDescriptorName(TypeDescriptor* typeDescriptor) const;
 	static std::string pointerToHexString(int* ptr);
 	static std::string charToHex(char c);
+	static std::string boolToString(bool b);
 
 	// ---- Garbage Collection
 	void mark(Block* rootPointer);
