@@ -317,6 +317,7 @@ void Heap::gc(void* rootPointers[]) {
 	}
 
 	// ---- Sweep Phase
+	sweep();
 }
 
 /**
@@ -358,7 +359,7 @@ void Heap::mark(Block* rootPointer) {
 		// The current block as visited
 		currentVisitIndex[cur] =  currentVisitIndex[cur] + 1;
 		int curIdx = currentVisitIndex[cur];
-		cur->mark();// Somewhat redundant to mark it each time, but checking it would also be almost the same effort
+		cur->mark(true); // Somewhat redundant to mark it each time, but checking it would also be almost the same effort
 
 #if DEBUG
 		std::cout << "Marked block " << cur << " with index " << curIdx << std::endl;
@@ -400,5 +401,37 @@ void Heap::mark(Block* rootPointer) {
  * Builds a new freelist and merge adjacent free blocks
  */
 void Heap::sweep() {
+	Block* p = (Block*) heap_buffer;
+	FreeBlock* free = nullptr;
 
+	while((void*) p < getHeapEnd()) {
+		if(p->isFreeBlock()) {
+			p->mark(false);
+		} else {
+			TypeDescriptor* pTD = p->getTypeDescriptor();
+			int size = pTD->totalSize;
+
+			Block* q = (Block*)((char*) p + size);
+			// FIXME: Here a SegFault occurs
+			TypeDescriptor* qTD = q->getTypeDescriptor();
+			while(q < getHeapEnd() && !q->isMarked()) {
+				// Merge
+				size += qTD->totalSize;
+				q = q + qTD->totalSize;
+			}
+			p->setTypeDescriptor((TypeDescriptor*) p);
+			pTD->totalSize = size;
+			FreeBlock* freeP = (FreeBlock*) p;
+			freeP->setNextFreePointer(free);
+			free = freeP;
+		}
+	}
+}
+
+/**
+ * Calculates and returns the end of the heap
+ * @return Address of the end of the heap
+ */
+void* Heap::getHeapEnd() const {
+	return (char*)heap_buffer + HEAP_SIZE;
 }

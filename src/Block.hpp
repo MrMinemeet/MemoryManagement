@@ -24,7 +24,7 @@ public:
 	virtual std::string ToString() const;
 	bool isFreeBlock() const;
 	bool isMarked() const;
-	void mark();
+	void mark(bool b);
 
 	/**
 	* Returns the getDataPart pointer of this block.

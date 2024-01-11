@@ -80,7 +80,10 @@ void Block::setTypeDescriptor(TypeDescriptor* descriptor) {
 /**
  * Marks the block by setting the LSB of the type descriptor to 1
  */
-void Block::mark() {
+void Block::mark(bool b) {
 	// Set the LSB to 1
-	typeDescriptor = (TypeDescriptor*) ((uintptr_t) typeDescriptor | 1);
+	if (b)
+		typeDescriptor = (TypeDescriptor*) ((uintptr_t) typeDescriptor | 1);
+	else
+		typeDescriptor = (TypeDescriptor*) (((uintptr_t) typeDescriptor >> 1) << 1);
 }

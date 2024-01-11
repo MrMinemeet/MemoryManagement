@@ -28,8 +28,9 @@ private:
 	static std::string boolToString(bool b);
 
 	// ---- Garbage Collection
-	void mark(Block* rootPointer);
+	static void mark(Block* rootPointer);
 	void sweep();
+	void* getHeapEnd() const;
 
 
 public:
