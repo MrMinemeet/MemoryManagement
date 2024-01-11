@@ -46,7 +46,8 @@ public:
 	std::string ToString();
 
 	// ---- Garbage Collection
-	void gc(void** rootPointers);
+	void gc(void* rootPointers[]);
+	void gc(Block* rootPointers[]);
 };
 
 #endif// HEAP_HPP

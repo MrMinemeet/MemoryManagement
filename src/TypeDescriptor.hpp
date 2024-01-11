@@ -10,10 +10,9 @@ class TypeDescriptor {
 		int offsetAmount;
 
 		TypeDescriptor(int obj_size, int* pointer_offset_array, int offset_amount);  // Constructor declaration
-		~TypeDescriptor(); // Destructor declaration
 
 		// ToString method declaration
-		std::string ToString();
+		std::string ToString() const;
 };
 
 #endif // TYPEDESCRIPTOR_HPP

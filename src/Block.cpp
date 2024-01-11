@@ -32,7 +32,7 @@ std::string Block::ToString() const {
  */
 bool Block::isFreeBlock() const {
 	FreeBlock* fb = (FreeBlock*) this;
-	return (void*) fb->typeDescriptor == fb->dataPosition();
+	return (void*) fb->getTypeDescriptor() == fb->dataPosition();
 }
 void* Block::getDataPart() const {
 	// "this + sizeof(Block)" is the effective getDataPart for the block
@@ -40,13 +40,13 @@ void* Block::getDataPart() const {
 }
 
 int Block::totalSize() const {
-	return typeDescriptor->totalSize + headerSize();
+	return getTypeDescriptor()->totalSize + headerSize();
 }
 int Block::headerSize() const {
 	return sizeof(Block);
 }
 int Block::dataSize() const {
-	return typeDescriptor->totalSize;
+	return getTypeDescriptor()->totalSize;
 }
 
 /**
@@ -54,7 +54,6 @@ int Block::dataSize() const {
  * @return  If the LSB is 1 it is marked and true is returned., otherwise returns false
  */
 bool Block::isMarked() const {
-	void* idk = typeDescriptor;
 	// Check if the lsb is a 1 or a 0
 	ulong maskedAddress = ((uintptr_t) typeDescriptor & 1);
 	return maskedAddress == 1;
@@ -76,4 +75,12 @@ TypeDescriptor* Block::getTypeDescriptor() const {
  */
 void Block::setTypeDescriptor(TypeDescriptor* descriptor) {
 	typeDescriptor = descriptor;
+}
+
+/**
+ * Marks the block by setting the LSB of the type descriptor to 1
+ */
+void Block::mark() {
+	// Set the LSB to 1
+	typeDescriptor = (TypeDescriptor*) ((uintptr_t) typeDescriptor | 1);
 }

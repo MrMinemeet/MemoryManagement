@@ -1,5 +1,6 @@
 #include "Declarations.hpp"
 #include "Heap.hpp"
+#include "SlideBlock.hpp"
 #include "TypeDescriptor.hpp"
 #include <iostream>
 #include <string>
@@ -38,9 +39,13 @@ int main() {
 	for (int i = 0; i < 2; ++i) {
 		std::cout << std::endl;
 		std::cout << "Block number " << i << ":" << std::endl;
-		heap.alloc("SlideBlock");
+		blockFromTD = heap.alloc("SlideBlock");
 		std::cout << blockFromTD->ToString() << std::endl;
 	}
+
+	// I just use "new" here to trigger the constructor
+	SlideBlock* sb = new (blockFromTD->getDataPart()) SlideBlock();
+
 	std::cout << heap.ToString() << std::endl;
 
 	// Test dump
@@ -51,14 +56,11 @@ int main() {
 	std::cout << std::endl;
 	std::cout << "Testing garbage collection…" << std::endl;
 	// Generate root pointer array
-	Block** rootPointers = new Block*[2];
+	void* rootPointers[] = {nullptr, nullptr};
 	rootPointers[0] = blockFromTD;
 	rootPointers[1] = nullptr;
-	heap.gc((void**)&blockFromTD);
+	heap.gc(rootPointers);
 	heap.dump();
-
-	// free rootPointer array (otherwise the array leaks)
-	delete[] rootPointers;
 
 	/*
 	Block* a = heap.alloc(512);

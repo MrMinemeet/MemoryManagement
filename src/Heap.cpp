@@ -296,19 +296,28 @@ std::string Heap::getTypeDescriptorName(TypeDescriptor* typeDescriptor) const {
  * The root is an array of root pointers with a null value as termination.
  * @param array of root pointers
  */
-void Heap::gc(void** rootPointers) {
+void Heap::gc(void* rootPointers[]) {
 	// ---- Mark Phase
 
 	// Loop through all root pointers
 	for(int i = 0; rootPointers[i] != nullptr; ++i) {
 		// Run Marking starting from that root pointer
 		void* rootPointer = rootPointers[i];
-		mark((Block*)rootPointer);
+		mark(static_cast<Block*>(rootPointer));
 	}
 
 	// ---- Sweep Phase
-
 }
+
+/**
+ * Call GC with an array of root pointers.
+ * @param rootPointers array of Block root pointers
+ */
+void Heap::gc(Block* rootPointers[]) {
+	// Basically just a helper because of size difference between void* and Block* when using indices access
+	gc((void**) rootPointers);
+}
+
 
 /**
  * Marks objects that can be (in-)directly reached from the roots.
@@ -317,8 +326,63 @@ void Heap::gc(void** rootPointers) {
  */
 void Heap::mark(Block* rootPointer) {
 	// Skip if no valid pointer or was already checked
-	if(rootPointer == nullptr || rootPointer->isMarked()) {
+	if (rootPointer == nullptr || rootPointer->isMarked()) {
 		return;
+	}
+
+	/* Instead of marking the currently visited pointer inside "Block" I decided to use a map here.
+	 * Since this is only needed for the marking phase, I think it is okay to use a map here.
+	 */
+	std::unordered_map<Block*, int> currentVisitIndex;
+
+	Block* prev = nullptr;
+	Block* cur = rootPointer;// Don't want to use rootPointer directly, as it is a parameter
+	while (true) {
+		if (!currentVisitIndex.contains(cur)) {
+			// Add to map if never visited before
+			currentVisitIndex.insert({cur, -1});
+#if DEBUG
+			std::cout << "Added block curChildIdx " << cur << " to map" << std::endl;
+#endif
+		}
+		// The current block as visited
+		currentVisitIndex[cur] =  currentVisitIndex[cur] + 1;
+		int curIdx = currentVisitIndex[cur];
+		cur->mark();// Somewhat redundant to mark it each time, but checking it would also be almost the same effort
+
+#if DEBUG
+		std::cout << "Marked block " << cur << " with index " << curIdx << std::endl;
+#endif
+		int offset = cur->getTypeDescriptor()->pointerOffsetArray[curIdx];
+		if (curIdx < cur->getTypeDescriptor()->offsetAmount) {
+			// Advance
+#if DEBUG
+			std::cout << "Advancing to child " << curIdx << " of block " << cur << std::endl;
+#endif
+			Block** childPointerAddr = (Block**) ((int*) cur->getDataPart() + offset);
+			Block* p = *childPointerAddr;
+			if (p != nullptr && !p->isMarked()) {
+				// Basically a "cur.td.pointerOffset[curIdx] = prev" operation
+				*childPointerAddr = prev;
+				prev = cur;
+				cur = p;
+			}
+		} else {
+			// Retreat
+#if DEBUG
+			std::cout << "Retreating from block " << cur << std::endl;
+#endif
+			if (prev == nullptr) {
+				// Done
+				break;
+			}
+			Block* p = cur;
+			cur = prev;
+			// Basically a "prev = cur.td.pointerOffset[curIdx]" operation
+			prev = (Block*) *((Block**) ((char*) cur->getDataPart() + offset));
+			// Basically a "cur.td.pointerOffset[curIdx] = p" operation
+			*((Block**) ((char*) cur->getDataPart() + offset)) = p;
+		}
 	}
 }
 
