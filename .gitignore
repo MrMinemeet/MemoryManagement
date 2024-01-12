@@ -45,4 +45,7 @@ cmake_install.cmake
 Makefile
 
 # Binary
-SystemSoftware_MemoryManagement
+MemoryManagement
+
+# Other
+*.cbp
