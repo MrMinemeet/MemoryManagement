@@ -10,12 +10,6 @@
  */
 FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null here, and set further below. Otherwise, the debug info would overwrite it.
 	int actualSize = requestedSize + (int) sizeof(FreeBlock);
-#if DEBUG
-	// Fill memory with 0x01 (to mark as free)
-	for (int i = 0; i < actualSize; ++i) {
-		((char*) this)[i] = (char) 0x01;
-	}
-#endif
 
 	// rawTypeDescriptor is a pointer to the data part of the free block
 	this->setTypeDescriptor((TypeDescriptor*) ((char*) this + sizeof(FreeBlock)));

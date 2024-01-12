@@ -4,17 +4,7 @@
  * The head takes 8 bytes in memory for the rawTypeDescriptor pointer.
  * The rest until the next block is the data part. which depends on the rawTypeDescriptor
  */
-UsedBlock::UsedBlock(TypeDescriptor* typeDescriptor): Block(typeDescriptor) {
-#if DEBUG
-	// Fill memory with 0x02 (for debugging)
-	if (rawTypeDescriptor != nullptr) {
-		int totalSize = rawTypeDescriptor->totalSize;
-		for (int i = 0; i < totalSize + sizeof(Block); ++i) {
-			((char*) this)[i] = (char) 0x02;
-		}
-	}
-#endif
-}
+UsedBlock::UsedBlock(TypeDescriptor* typeDescriptor): Block(typeDescriptor) {}
 
 std::string UsedBlock::ToString() const {
 	std::string str = "UsedBlock { ";

@@ -2,6 +2,7 @@
 #define SYSTEMSOFTWARE_MEMORYMANAGEMENT_FREEBLOCK_HPP
 
 #include "Block.hpp"
+#include <iostream>
 
 /**
  * "A special "Block" that is used to mark free memory.

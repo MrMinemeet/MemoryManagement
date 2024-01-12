@@ -322,7 +322,7 @@ void Heap::gc(void* rootPointers[]) {
 		void* rootPointer = rootPointers[i];
 		mark(static_cast<Block*>(rootPointer));
 	}
-#if true
+#if DEBUG
 	dump();
 #endif
 
@@ -362,7 +362,7 @@ void Heap::mark(Block* rootPointer) {
 		if (!currentVisitIndex.contains(cur)) {
 			// Add to map if never visited before
 			currentVisitIndex.insert({cur, -1});
-#if true
+#if DEBUG
 			std::cout << "Added block curChildIdx " << cur << " to map" << std::endl;
 #endif
 		}
@@ -371,7 +371,7 @@ void Heap::mark(Block* rootPointer) {
 		int curIdx = currentVisitIndex[cur];
 		cur->mark(true); // Somewhat redundant to mark it each time, but checking it would also be almost the same effort
 
-#if true
+#if DEBUG
 		std::cout << "Marked block " << cur << " with index " << curIdx << std::endl;
 #endif
 		// I don't know why I cant collapse this into one line. If I do so, a SegFault occurs.
@@ -380,7 +380,7 @@ void Heap::mark(Block* rootPointer) {
 		if (td != (void*) 0x1 &&  // TD == nullptr (but with mark bit). This indicates the block was the last free block without next
 			curIdx < cur->getTypeDescriptor()->offsetAmount) {
 			// Advance
-#if true
+#if DEBUG
 			std::cout << "Advancing to child " << curIdx << " of block " << cur << std::endl;
 #endif
 			int offset = cur->getTypeDescriptor()->pointerOffsetArray[curIdx];
@@ -394,7 +394,7 @@ void Heap::mark(Block* rootPointer) {
 			}
 		} else {
 			// Retreat
-#if true
+#if DEBUG
 			std::cout << "Retreating from block " << cur << std::endl;
 #endif
 			if (prev == nullptr) {
@@ -423,22 +423,22 @@ void Heap::sweep() {
 		int nextBlockOffset = 0;
 		if(cur->isMarked()) {
 			// Keep "cur"
-#if true
+#if DEBUG
 			std::cout << "Keeping block with address " << pointerToHexString((int*) cur) << " and data " << cur->dataSize() << " bytes" << std::endl;
 #endif
 			cur->mark(false);
 			nextBlockOffset = cur->headerSize() + cur->dataSize();
 		} else {
 			// Collect "cur"
-#if true
+#if DEBUG
 			std::cout << "Collecting block with address " << pointerToHexString((int*) cur) << " and data " << cur->dataSize() << " bytes" << std::endl;
 #endif
 			Block* nextBlk = (Block*)((char*) cur + cur->headerSize() + cur->dataSize());
-			// FIXME: SOMETHING HERE IS STILL WRONG
+
 			int size = cur->dataSize();
 			while(nextBlk < getHeapEnd() && !nextBlk->isMarked()) {
 				// Merge with next free block
-				size += nextBlk->dataSize();
+				size += nextBlk->totalSize();
 				nextBlk = nextBlk + nextBlk->dataSize();
 				// Check if "headFB" was merged into
 			}
@@ -451,13 +451,13 @@ void Heap::sweep() {
 			// Re-add the freed bytes to free_bytes
 			free_bytes += cur->totalSize();
 
-			// Move curr by current's total size
-			nextBlockOffset = cur->headerSize() + size; // FIXME: The size is wrong here
+			// Move curr by current head + size of this data and total of next free blocks
+			nextBlockOffset = cur->headerSize() + size;
 		}
 		cur = (Block*) ((char*) cur + nextBlockOffset);
 	}
 
-#if true
+#if DEBUG
 	std::cout << "Collected " << (free_bytes - beforeSweepFreeBytes) << " bytes of data!" << std::endl;
 #endif
 }
@@ -468,7 +468,4 @@ void Heap::sweep() {
  */
 void* Heap::getHeapEnd() const {
 	return (char*)heap_buffer + HEAP_SIZE;
-}
-FreeBlock* Heap::getHead() const {
-	return fbHead;
 }
