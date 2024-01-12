@@ -1,14 +1,9 @@
-//
-// Created by mrminemeet on 18.12.23.
-//
-
 #include "FreeBlock.hpp"
 #include "Declarations.hpp"
-#include <iostream>
 
 /*
  * Takes 20 bytes in memory:
- * - 8 bytes for the typeDescriptor pointer (Actual head)
+ * - 8 bytes for the rawTypeDescriptor pointer (Actual head)
  * - 4 bytes for the size of the data part (Data Part)
  * - 8 bytes for the pointer to the next free block (Data Part)
  * The rest of the data part until the next block is not used for anything specifically and just sits around until the free block is (partially) allocated.
@@ -22,8 +17,8 @@ FreeBlock::FreeBlock(int requestedSize) : Block(nullptr) {// Explicitly null her
 	}
 #endif
 
-	// typeDescriptor is a pointer to the data part of the free block
-	this->setTypeDescriptor((TypeDescriptor*) ((char*) this + sizeof(FreeBlock))); // Explicitly written in order to avoid virtual function calls in constructor
+	// rawTypeDescriptor is a pointer to the data part of the free block
+	this->setTypeDescriptor((TypeDescriptor*) ((char*) this + sizeof(FreeBlock)));
 	// Size of the data part of the whole free block
 	this->setObjSize(actualSize);
 	// Pointer to the next free block, which is nullptr per default
@@ -46,9 +41,11 @@ void FreeBlock::setObjSize(int size) {
 /**
  * At second position of data part, there is a pointer to the next free block
  */
-void* FreeBlock::getNextFreePointer() {
-	return (char*) dataPosition() + sizeof(int);
+void* FreeBlock::getNextFreePointer() const {
+	void* dataPos = dataPosition();
+	return (char*) dataPos + sizeof(int);
 }
+
 void FreeBlock::setNextFreePointer(void* nextFree) {
 #if DEBUG
 	std::cout << "Setting next free pointer of (" << this << ") to (" << nextFree << ")" << std::endl;
@@ -62,7 +59,8 @@ void FreeBlock::setNextFreePointer(void* nextFree) {
  * @return nullptr if this is the last free block
  */
 FreeBlock* FreeBlock::getNextFree() {
-	return *(FreeBlock**) getNextFreePointer();
+	FreeBlock* nextFree = *(FreeBlock**) getNextFreePointer();
+	return nextFree;
 }
 
 std::string FreeBlock::ToString() const {

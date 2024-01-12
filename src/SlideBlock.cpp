@@ -1,7 +1,8 @@
 #include "SlideBlock.hpp"
+
 SlideBlock::SlideBlock() {
-	x = nullptr;
-	y = nullptr;
-	z = nullptr;
+	x = (Block*) nullptr;
+	y = (Block*) nullptr;
 	data = 0;
+	z = (Block*) nullptr;
 }

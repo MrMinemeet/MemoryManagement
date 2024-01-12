@@ -6,17 +6,9 @@
 
 class Block {
 private:
-	TypeDescriptor* typeDescriptor;
+	TypeDescriptor* rawTypeDescriptor;
 
 public:
-
-	// GC
-	/*
-	bool marked;
-	Block* left;
-	Block* right;
-	*/
-
 	// Constructor
 	Block(TypeDescriptor* typeDescriptor);
 
@@ -33,7 +25,9 @@ public:
 	*/
 	virtual void* getDataPart() const;
 	virtual TypeDescriptor* getTypeDescriptor() const;
+	virtual TypeDescriptor* getRawTypeDescriptor() const;
 	virtual void setTypeDescriptor(TypeDescriptor* descriptor);
+	void* getChildPointer(int offset) const;
 
 	virtual int totalSize() const;
 	virtual int headerSize() const;

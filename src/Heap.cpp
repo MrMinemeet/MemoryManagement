@@ -69,7 +69,7 @@ UsedBlock* Heap::alloc(const std::string& type) {
 			fbHead = cur->getNextFree();
 		} else {
 			// cur is not the head of the free list, set the next free block as the next free block of the previous block
-			*(FreeBlock**) prev->getNextFreePointer() = cur->getNextFree();
+			prev->setNextFreePointer(cur->getNextFree());
 		}
 	} else {
 #if DEBUG
@@ -77,9 +77,11 @@ UsedBlock* Heap::alloc(const std::string& type) {
 #endif
 		// Split
 		// Create a new FreeBlock after the allocated block
-		FreeBlock* newFreeBlock = new ((char*) cur + requestedTotalSize) FreeBlock(leftOver - (int) sizeof(FreeBlock));
+		void* afterCur = (char*) cur + requestedTotalSize;
+		FreeBlock* newFreeBlock = new (afterCur) FreeBlock(leftOver - (int) sizeof(FreeBlock));
 		// Set the next freeBlock of the new FreeBlock to the next free block of cur
-		newFreeBlock->setNextFreePointer(cur->getNextFree());
+		void* nextFree = cur->getNextFree();
+		newFreeBlock->setNextFreePointer(nextFree);
 		// Set the nextFreeBlock of prev to the new FreeBlock
 		if (prev == nullptr) {
 			// cur is the head of the free list, set the new FreeBlock as the new head
@@ -90,7 +92,7 @@ UsedBlock* Heap::alloc(const std::string& type) {
 		}
 	}
 
-	// Set the typeDescriptor of the allocated block
+	// Set the rawTypeDescriptor of the allocated block
 	UsedBlock* block = new (cur) UsedBlock(typeDescriptor);
 
 	// Adjust free_bytes
@@ -128,13 +130,13 @@ void Heap::dealloc(Block* block) {
 }
 */
 
-/// Register a typeDescriptor with the Heap. Will return true if the typeDescriptor was successfully registered, false otherwise.
+/// Register a rawTypeDescriptor with the Heap. Will return true if the rawTypeDescriptor was successfully registered, false otherwise.
 bool Heap::registerType(const std::string& type, TypeDescriptor& descriptor) {
 	if (type_map.find(type) != type_map.end()) {
 		std::cout << "Type " << type << " already exists!" << std::endl;
 		return false;
 	}
-	std::cout << "Registering typeDescriptor " << type << std::endl;
+	std::cout << "Registering rawTypeDescriptor " << type << std::endl;
 	type_map[type] = &descriptor;
 	return true;
 }
@@ -144,7 +146,7 @@ std::string Heap::ToString() {
 	std::string str = "Heap {\n";
 	str += "Heap dataSize: " + std::to_string(HEAP_SIZE) + "\n";
 	str += "Free bytes: " + std::to_string(free_bytes) + " | Used bytes: " + std::to_string((HEAP_SIZE - free_bytes)) + "\n";
-	str += "Stored typeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
+	str += "Stored rawTypeDescriptor descriptors: " + std::to_string(type_map.size()) + "\n";
 
 	str += "Live blocks { ";
 	int traversedSize = 0;
@@ -197,8 +199,8 @@ void Heap::dump() const {
 	std::string postfix;
 	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
-	while (bCur != nullptr && traversedSize < HEAP_SIZE) {
-		int curBlkSize;
+	while (traversedSize < HEAP_SIZE && bCur != nullptr) {
+		int curBlkSize = 0;
 		if (!bCur->isFreeBlock()) {
 			// UsedBlock
 			UsedBlock* ubCur = (UsedBlock*) bCur;
@@ -218,15 +220,20 @@ void Heap::dump() const {
 				}
 			}
 			str += " ]\n";
-			str += "\t\tPointers: [ ";
+			str += "\t\tPointers: [\n";
 			for (int i = 0; i < type->offsetAmount; ++i) {
-				int* addr = (int*) ((char*) ubCur + type->pointerOffsetArray[i]);
-				str += Heap::pointerToHexString(addr);
+				str += "\t\t\t";
+				int offset = type->pointerOffsetArray[i];
+				int** addr = (int**) ubCur->getChildPointer(offset);
+				str += Heap::pointerToHexString((int*) addr);
+				str += " -> ";
+				int* actualChildAddr = *addr;
+				str += Heap::pointerToHexString(actualChildAddr);
 				if (i < type->offsetAmount - 1) {
-					str += ", ";
+					str += ",\n";
 				}
 			}
-			str += " ]\n";
+			str += "\n\t\t]\n";
 			str += "\t}\n";
 		} else {
 			// FreeBlock
@@ -288,9 +295,9 @@ std::string Heap::boolToString(bool b) {
 }
 
 /**
- * Returns the name of the typeDescriptor.
- * @param typeDescriptor The typeDescriptor to get the name of.
- * @return The name of the typeDescriptor.
+ * Returns the name of the rawTypeDescriptor.
+ * @param typeDescriptor The rawTypeDescriptor to get the name of.
+ * @return The name of the rawTypeDescriptor.
  */
 std::string Heap::getTypeDescriptorName(TypeDescriptor* typeDescriptor) const {
 	for (auto& it: type_map) {
@@ -315,6 +322,9 @@ void Heap::gc(void* rootPointers[]) {
 		void* rootPointer = rootPointers[i];
 		mark(static_cast<Block*>(rootPointer));
 	}
+#if true
+	dump();
+#endif
 
 	// ---- Sweep Phase
 	sweep();
@@ -352,7 +362,7 @@ void Heap::mark(Block* rootPointer) {
 		if (!currentVisitIndex.contains(cur)) {
 			// Add to map if never visited before
 			currentVisitIndex.insert({cur, -1});
-#if DEBUG
+#if true
 			std::cout << "Added block curChildIdx " << cur << " to map" << std::endl;
 #endif
 		}
@@ -361,26 +371,30 @@ void Heap::mark(Block* rootPointer) {
 		int curIdx = currentVisitIndex[cur];
 		cur->mark(true); // Somewhat redundant to mark it each time, but checking it would also be almost the same effort
 
-#if DEBUG
+#if true
 		std::cout << "Marked block " << cur << " with index " << curIdx << std::endl;
 #endif
-		int offset = cur->getTypeDescriptor()->pointerOffsetArray[curIdx];
-		if (curIdx < cur->getTypeDescriptor()->offsetAmount) {
+		// I don't know why I cant collapse this into one line. If I do so, a SegFault occurs.
+		Block bCur = *cur;
+		void* td = bCur.getRawTypeDescriptor();
+		if (td != (void*) 0x1 &&  // TD == nullptr (but with mark bit). This indicates the block was the last free block without next
+			curIdx < cur->getTypeDescriptor()->offsetAmount) {
 			// Advance
-#if DEBUG
+#if true
 			std::cout << "Advancing to child " << curIdx << " of block " << cur << std::endl;
 #endif
-			Block** childPointerAddr = (Block**) ((int*) cur->getDataPart() + offset);
-			Block* p = *childPointerAddr;
-			if (p != nullptr && !p->isMarked()) {
-				// Basically a "cur.td.pointerOffset[curIdx] = prev" operation
+			int offset = cur->getTypeDescriptor()->pointerOffsetArray[curIdx];
+			void** childPointerAddr = (void**) cur->getChildPointer(offset);
+			Block* child = (Block*) *childPointerAddr;
+			if (child != nullptr && !child->isMarked()) {
+				// cur.td.pointerOffset[curIdx] = prev
 				*childPointerAddr = prev;
 				prev = cur;
-				cur = p;
+				cur = child;
 			}
 		} else {
 			// Retreat
-#if DEBUG
+#if true
 			std::cout << "Retreating from block " << cur << std::endl;
 #endif
 			if (prev == nullptr) {
@@ -389,10 +403,8 @@ void Heap::mark(Block* rootPointer) {
 			}
 			Block* p = cur;
 			cur = prev;
-			// Basically a "prev = cur.td.pointerOffset[curIdx]" operation
-			prev = (Block*) *((Block**) ((char*) cur->getDataPart() + offset));
-			// Basically a "cur.td.pointerOffset[curIdx] = p" operation
-			*((Block**) ((char*) cur->getDataPart() + offset)) = p;
+			prev = (Block*) *((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])); // prev = cur.td.pointerOffset[curIdx]
+			*((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])) = p; // cur.td.pointerOffset[curIdx] = p
 		}
 	}
 }
@@ -401,31 +413,53 @@ void Heap::mark(Block* rootPointer) {
  * Builds a new freelist and merge adjacent free blocks
  */
 void Heap::sweep() {
-	Block* p = (Block*) heap_buffer;
+	uint beforeSweepFreeBytes = free_bytes;
+
+	Block* cur = (Block*) heap_buffer;
 	FreeBlock* free = nullptr;
-
-	while((void*) p < getHeapEnd()) {
-		if(p->isFreeBlock()) {
-			p->mark(false);
+	void* heapEnd = getHeapEnd();
+	while((void*) cur < heapEnd) {
+		Block bCur = *cur;
+		int nextBlockOffset = 0;
+		if(cur->isMarked()) {
+			// Keep "cur"
+#if true
+			std::cout << "Keeping block with address " << pointerToHexString((int*) cur) << " and data " << cur->dataSize() << " bytes" << std::endl;
+#endif
+			cur->mark(false);
+			nextBlockOffset = cur->headerSize() + cur->dataSize();
 		} else {
-			TypeDescriptor* pTD = p->getTypeDescriptor();
-			int size = pTD->totalSize;
-
-			Block* q = (Block*)((char*) p + size);
-			// FIXME: Here a SegFault occurs
-			TypeDescriptor* qTD = q->getTypeDescriptor();
-			while(q < getHeapEnd() && !q->isMarked()) {
-				// Merge
-				size += qTD->totalSize;
-				q = q + qTD->totalSize;
+			// Collect "cur"
+#if true
+			std::cout << "Collecting block with address " << pointerToHexString((int*) cur) << " and data " << cur->dataSize() << " bytes" << std::endl;
+#endif
+			Block* nextBlk = (Block*)((char*) cur + cur->headerSize() + cur->dataSize());
+			// FIXME: SOMETHING HERE IS STILL WRONG
+			int size = cur->dataSize();
+			while(nextBlk < getHeapEnd() && !nextBlk->isMarked()) {
+				// Merge with next free block
+				size += nextBlk->dataSize();
+				nextBlk = nextBlk + nextBlk->dataSize();
+				// Check if "headFB" was merged into
 			}
-			p->setTypeDescriptor((TypeDescriptor*) p);
-			pTD->totalSize = size;
-			FreeBlock* freeP = (FreeBlock*) p;
-			freeP->setNextFreePointer(free);
-			free = freeP;
+			cur->setTypeDescriptor((TypeDescriptor*) cur->getDataPart()); // cur.tag = cur
+			FreeBlock* freeCur = (FreeBlock*) cur;
+			freeCur->setObjSize(size); // cur.tag.curDataSize = curDataSize
+			freeCur->setNextFreePointer(free); // cur.next = free
+			free = freeCur; // free = cur
+
+			// Re-add the freed bytes to free_bytes
+			free_bytes += cur->totalSize();
+
+			// Move curr by current's total size
+			nextBlockOffset = cur->headerSize() + size; // FIXME: The size is wrong here
 		}
+		cur = (Block*) ((char*) cur + nextBlockOffset);
 	}
+
+#if true
+	std::cout << "Collected " << (free_bytes - beforeSweepFreeBytes) << " bytes of data!" << std::endl;
+#endif
 }
 
 /**
@@ -434,4 +468,7 @@ void Heap::sweep() {
  */
 void* Heap::getHeapEnd() const {
 	return (char*)heap_buffer + HEAP_SIZE;
+}
+FreeBlock* Heap::getHead() const {
+	return fbHead;
 }
