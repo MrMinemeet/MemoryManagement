@@ -1,8 +1,11 @@
 #ifndef MEMORYMANAGEMENT_STUDENT_HPP
 #define MEMORYMANAGEMENT_STUDENT_HPP
 
+#include "Heap.hpp"
 #include "LectNode.hpp"
 #include <string>
+
+extern Heap heap;
 /**
  * Size of 48 Bytes:
  * - 4 byte int for id  		(0 offset)
@@ -17,7 +20,7 @@ public:
 	int id;
 	std::string name;
 	LectNode* lect;
-	void add(Lecture lecture);
+	void add(Lecture* lecture);
 	void remove(Lecture lecture);
 };
 

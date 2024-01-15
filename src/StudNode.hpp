@@ -10,6 +10,7 @@
 class StudNode {
 public:
 	StudNode();
+	StudNode(StudNode* next, Student* stud);
 
 	StudNode* next;
 	Student* stud;

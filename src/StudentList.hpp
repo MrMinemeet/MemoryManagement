@@ -11,8 +11,8 @@ public:
 	StudentList();
 
 	StudNode* first;
-	void add(Student student);
-	void remove(Student student);
+	void add(Student* student);
+	void remove(Student* student);
 };
 
 #endif//MEMORYMANAGEMENT_STUDENTLIST_HPP

@@ -18,7 +18,7 @@
 class Heap {
 private:
 	// TODO: Adjust heap to 32 KiB for the final submission
-	const int HEAP_SIZE = 128;// as bytes
+	const int HEAP_SIZE = 32 KiB;// as bytes
 	void* heap_buffer;
 	uint free_bytes;
 	FreeBlock* fbHead;
@@ -35,23 +35,25 @@ private:
 
 
 public:
+	static Heap heap;
+
 	// Constructor
 	Heap();
 
 	// Destructor
 	~Heap();
-
 	// Methods
 	UsedBlock* alloc(const std::string& type);
 	//void dealloc(Block* block);
 	bool registerType(const std::string& type, TypeDescriptor& descriptor);
 	void dump() const;
-	std::string ToString();
 
+	std::string ToString();
 	// ---- Garbage Collection
 	void gc(void* rootPointers[]);
-	void gc(Block* rootPointers[]);
 
+
+	void gc(Block* rootPointers[]);
 
 	// tmp debug helper
 	FreeBlock* getHead() const;
