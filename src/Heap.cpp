@@ -412,8 +412,11 @@ void Heap::mark(Block* rootPointer) {
 void Heap::sweep() {
 	uint beforeSweepFreeBytes = free_bytes;
 
+
+	FreeBlock* newFbHead = nullptr;
+	FreeBlock* fbListCur = nullptr;
+
 	Block* cur = (Block*) heap_buffer;
-	FreeBlock* free = nullptr;
 	void* heapEnd = getHeapEnd();
 	while((void*) cur < heapEnd) {
 		Block bCur = *cur;
@@ -450,17 +453,27 @@ void Heap::sweep() {
 				nextBlk = (Block*) ((char*) nextBlk + nextBlk->totalSize());
 			}
 			cur->setTypeDescriptor((TypeDescriptor*) cur->getDataPart()); // cur.tag = cur
-			FreeBlock* freeCur = (FreeBlock*) cur;
-			freeCur->setObjSize(cur->headerSize() + newFreeBlkSize); // cur.tag.curDataSize = curDataSize
-			freeCur->setNextFreePointer(free); // cur.next = free
-			free = freeCur; // free = cur
+			FreeBlock* newFree = (FreeBlock*) cur;
+			newFree->setObjSize(cur->headerSize() + newFreeBlkSize); // cur.tag.curDataSize = curDataSize
 
+			if(newFbHead == nullptr) {
+				// New freeList was empty until nuw
+				newFbHead = newFree;
+			} else {
+				// Existing freeList -> Append newFree to end
+				fbListCur->setNextFreePointer(newFree);
+			}
+			// Progress end of newFbList to the newly added FreeBlock
+			fbListCur = newFree;
 
-			// Move curr by current head + newFreeBlkSize of this data and total of next free blocks
+			// Move curr by current head + newFreeBlkSize of this data and total of next newFbHead blocks
 			nextBlockOffset = cur->headerSize() + newFreeBlkSize;
 		}
 		cur = (Block*) ((char*) cur + nextBlockOffset);
 	}
+
+	// Replace old free list new one
+	fbHead = newFbHead;
 
 #if DEBUG
 	std::cout << "Collected " << (free_bytes - beforeSweepFreeBytes) << " bytes of data!" << std::endl;
