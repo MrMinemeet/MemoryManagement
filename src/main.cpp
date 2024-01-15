@@ -10,14 +10,15 @@
 #include <iostream>
 #include <string>
 
+Heap heap;
+
 int main() {
 #if DEBUG
 	std::cout << "DEBUG-mode enabled!" << std::endl;
 #endif
 	std::cout << "Hello, GC user!" << std::endl;
-	Heap heap;
 	//heap.dump();
-
+	/*
 	// TD based on "Garbage Collection" slide-set page 22
 	// Create TypeDescriptor for a class (Block x; Block y; int getDataPart; Block z;)
 	std::cout << std::endl;
@@ -32,7 +33,68 @@ int main() {
 		std::cout << "Failed to register rawTypeDescriptor!" << std::endl;
 		return 1;
 	}
+	*/
+	TypeDescriptor lecture_td = TypeDescriptor(48,
+									   new int[3]{0,8,40},
+									   3);
+	heap.registerType("Lecture", lecture_td);
 
+	TypeDescriptor lectNode_td = TypeDescriptor(16,
+												new int[2]{0,8},
+												2);
+	heap.registerType("LectNode", lectNode_td);
+
+	TypeDescriptor student_td = TypeDescriptor(48,
+											   new int[3]{0,8, 40},
+											   3);
+	heap.registerType("Student", student_td);
+
+	TypeDescriptor studNode_td = TypeDescriptor(16,
+											   new int[2]{0,8},
+											   2);
+	heap.registerType("StudNode", studNode_td);
+
+	TypeDescriptor studentList_td = TypeDescriptor(8,
+											   new int[1]{0},
+											   1);
+	heap.registerType("StudentList", studentList_td);
+
+
+	UsedBlock* ub = heap.alloc("Lecture");
+	Lecture* l0 = new (ub->getDataPart()) Lecture();
+	ub = heap.alloc("Lecture");
+	Lecture* l1 = new (ub->getDataPart()) Lecture();
+	ub = heap.alloc("Lecture");
+	Lecture* l2 = new (ub->getDataPart()) Lecture();
+
+	ub = heap.alloc("Student");
+	Student* s0 = new (ub->getDataPart()) Student();
+	ub = heap.alloc("Student");
+	Student* s1 = new (ub->getDataPart()) Student();
+	ub = heap.alloc("Student");
+	Student* s2 = new (ub->getDataPart()) Student();
+
+	s0->add(l2);
+	s0->add(l1);
+	s0->add(l0);
+
+	s1->add(l2);
+	s1->add(l0);
+
+	s2->add(l2);
+	s2->add(l1);
+
+
+	ub = heap.alloc("StudentList");
+	StudentList* studentList = new (ub->getDataPart()) StudentList();
+
+	studentList->add(s0);
+	studentList->add(s1);
+	studentList->add(s2);
+
+	heap.dump();
+
+	/*
 	std::cout << std::endl;
 	std::cout << "Allocating 'SlideBlock'…" << std::endl;
 	UsedBlock* b1 = heap.alloc("SlideBlock");

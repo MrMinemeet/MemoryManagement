@@ -10,6 +10,8 @@
 class LectNode {
 public:
 	LectNode();
+	LectNode(Lecture* lect);
+	LectNode(LectNode* next, Lecture* lect);
 
 	LectNode* next;
 	Lecture* lect;
