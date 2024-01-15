@@ -3,9 +3,17 @@
 
 #include "LectNode.hpp"
 #include <string>
-
+/**
+ * Size of 48 Bytes:
+ * - 4 byte int for id  		(0 offset)
+ * - 4 byte padding				(4 offset)
+ * - 32 byte string for name	(8 offset)
+ * - 8 byte LectNode* for lect	(40 offset)
+ */
 class Student {
 public:
+	Student();
+
 	int id;
 	std::string name;
 	LectNode* lect;
