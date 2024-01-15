@@ -14,7 +14,3 @@ std::string UsedBlock::ToString() const {
 	str += "}";
 	return str;
 }
-
-int UsedBlock::headerSize() const {
-	return sizeof(UsedBlock);
-}

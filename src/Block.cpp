@@ -33,6 +33,7 @@ std::string Block::ToString() const {
  */
 bool Block::isFreeBlock() const {
 	FreeBlock* fb = (FreeBlock*) this;
+	auto td = fb->getTypeDescriptor();
 	return (void*) fb->getTypeDescriptor() == fb->dataPosition();
 }
 void* Block::getDataPart() const {
