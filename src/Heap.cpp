@@ -433,10 +433,20 @@ void Heap::sweep() {
 			Block* nextBlk = (Block*)((char*) cur + cur->totalSize());
 
 			int newFreeBlkSize = cur->dataSize();
+			// Free up data size of current
+			free_bytes += cur->dataSize();
 			while(nextBlk < getHeapEnd() && !nextBlk->isMarked()) {
-				// Merge with next free block
+				// Merge with next prevFree block
 				newFreeBlkSize += nextBlk->totalSize();
-				free_bytes += nextBlk->totalSize();
+
+				if(nextBlk->isFreeBlock()) {
+					// Add FREE-block header to prevFree bytes. Data size was already included in "free_bytes"
+					free_bytes += nextBlk->headerSize();
+				} else {
+					// A used UNMARKED block -> Add total size as re-claimed
+					free_bytes += nextBlk->totalSize();
+				}
+
 				nextBlk = (Block*) ((char*) nextBlk + nextBlk->totalSize());
 			}
 			cur->setTypeDescriptor((TypeDescriptor*) cur->getDataPart()); // cur.tag = cur
