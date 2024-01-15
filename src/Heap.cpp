@@ -197,9 +197,8 @@ void Heap::dump() const {
 	std::string str = "Total bytes used: " + std::to_string(HEAP_SIZE - free_bytes) + "\n";
 	str += "Live objects: {\n";
 	std::string postfix;
-	int traversedSize = 0;
 	Block* bCur = (Block*) heap_buffer;
-	while (traversedSize < HEAP_SIZE && bCur != nullptr) {
+	while (bCur < getHeapEnd() && bCur != nullptr) {
 		int curBlkSize = 0;
 		if (!bCur->isFreeBlock()) {
 			// UsedBlock
@@ -240,7 +239,6 @@ void Heap::dump() const {
 			FreeBlock* fbCur = (FreeBlock*) bCur;
 			curBlkSize = fbCur->totalSize();
 		}
-		traversedSize += curBlkSize;
 		bCur = (Block*) ((char*) bCur + curBlkSize);
 	}
 	str += "}\n";
@@ -375,23 +373,21 @@ void Heap::mark(Block* rootPointer) {
 #if DEBUG
 		std::cout << "Marked block " << cur << " with index " << curIdx << std::endl;
 #endif
-		// I don't know why I cant collapse this into one line. If I do so, a SegFault occurs.
-		Block bCur = *cur;
-		void* td = bCur.getRawTypeDescriptor();
-		if (td != (void*) 0x1 &&  // TD == nullptr (but with mark bit). This indicates the block was the last free block without next
-			curIdx < cur->getTypeDescriptor()->offsetAmount) {
+		if (curIdx < cur->getTypeDescriptor()->offsetAmount) {
 			// Advance
 #if DEBUG
 			std::cout << "Advancing to child " << curIdx << " of block " << cur << std::endl;
 #endif
 			int offset = cur->getTypeDescriptor()->pointerOffsetArray[curIdx];
 			void** childPointerAddr = (void**) cur->getChildPointer(offset);
-			Block* child = (Block*) *childPointerAddr;
-			if (child != nullptr && !child->isMarked()) {
-				// cur.td.pointerOffset[curIdx] = prev
-				*childPointerAddr = prev;
-				prev = cur;
-				cur = child;
+			if(*childPointerAddr != nullptr) {
+				Block* child = (Block*) ((char*) *childPointerAddr - sizeof(Block));
+				if (child != nullptr && !child->isMarked()) {
+					// cur.td.pointerOffset[curIdx] = prev
+					*childPointerAddr = prev;
+					prev = cur;
+					cur = child;
+				}
 			}
 		} else {
 			// Retreat
@@ -402,7 +398,7 @@ void Heap::mark(Block* rootPointer) {
 				// Done
 				break;
 			}
-			Block* p = cur;
+			Block* p = (Block*) ((char*) cur + sizeof(Block));
 			cur = prev;
 			prev = (Block*) *((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])); // prev = cur.td.pointerOffset[curIdx]
 			*((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])) = p; // cur.td.pointerOffset[curIdx] = p
@@ -425,35 +421,33 @@ void Heap::sweep() {
 		if(cur->isMarked()) {
 			// Keep "cur"
 #if DEBUG
-			std::cout << "Keeping block with address " << pointerToHexString((int*) cur) << " and data " << cur->dataSize() << " bytes" << std::endl;
+			std::cout << "Keeping block with address " << pointerToHexString((int*) cur) << " and data " << cur->totalSize() << " bytes" << std::endl;
 #endif
 			cur->mark(false);
 			nextBlockOffset = cur->headerSize() + cur->dataSize();
 		} else {
 			// Collect "cur"
 #if DEBUG
-			std::cout << "Collecting block with address " << pointerToHexString((int*) cur) << " and data " << cur->dataSize() << " bytes" << std::endl;
+			std::cout << "Collecting block with address " << pointerToHexString((int*) cur) << " and data " << cur->totalSize() << " bytes" << std::endl;
 #endif
-			Block* nextBlk = (Block*)((char*) cur + cur->headerSize() + cur->dataSize());
+			Block* nextBlk = (Block*)((char*) cur + cur->totalSize());
 
-			int size = cur->dataSize();
+			int newFreeBlkSize = cur->dataSize();
 			while(nextBlk < getHeapEnd() && !nextBlk->isMarked()) {
 				// Merge with next free block
-				size += nextBlk->totalSize();
-				nextBlk = nextBlk + nextBlk->dataSize();
-				// Check if "headFB" was merged into
+				newFreeBlkSize += nextBlk->totalSize();
+				free_bytes += nextBlk->totalSize();
+				nextBlk = (Block*) ((char*) nextBlk + nextBlk->totalSize());
 			}
 			cur->setTypeDescriptor((TypeDescriptor*) cur->getDataPart()); // cur.tag = cur
 			FreeBlock* freeCur = (FreeBlock*) cur;
-			freeCur->setObjSize(size); // cur.tag.curDataSize = curDataSize
+			freeCur->setObjSize(cur->headerSize() + newFreeBlkSize); // cur.tag.curDataSize = curDataSize
 			freeCur->setNextFreePointer(free); // cur.next = free
 			free = freeCur; // free = cur
 
-			// Re-add the freed bytes to free_bytes
-			free_bytes += cur->totalSize();
 
-			// Move curr by current head + size of this data and total of next free blocks
-			nextBlockOffset = cur->headerSize() + size;
+			// Move curr by current head + newFreeBlkSize of this data and total of next free blocks
+			nextBlockOffset = cur->headerSize() + newFreeBlkSize;
 		}
 		cur = (Block*) ((char*) cur + nextBlockOffset);
 	}

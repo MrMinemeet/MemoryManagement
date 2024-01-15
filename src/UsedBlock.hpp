@@ -20,8 +20,6 @@ public:
 
 	// Additional member function declarations, if needed
 	std::string ToString() const;
-
-	int headerSize() const override;
 };
 
 

@@ -43,7 +43,7 @@ int main() {
 
 	// Test dump
 	std::cout << std::endl;
-	heap.dump();
+	//heap.dump();
 
 	// Test garbage collection without stuff to collect
 	void* rootPointers[] = {nullptr, nullptr};
@@ -51,10 +51,11 @@ int main() {
 	rootPointers[1] = nullptr;
 	std::cout << std::endl;
 	std::cout << "Testing garbage collection when nothing is to collect…" << std::endl;
-	heap.gc(rootPointers);
+	//heap.gc(rootPointers);
 	heap.dump();
 
 	// Test garbage collection with stuff to collect
+	std::cout << "Removing pointer in SB1 pointing to SB2" << std::endl;
 	sb1->x = nullptr;
 	heap.dump();
 	std::cout << std::endl;
