@@ -33,9 +33,6 @@ std::string Block::ToString() const {
  */
 bool Block::isFreeBlock() const {
 	FreeBlock* fb = (FreeBlock*) this;
-	FreeBlock fbA = *fb;
-	TypeDescriptor* td = fb->getTypeDescriptor();
-	void* dataPart = fb->getDataPart();
 	return (void*) fb->getTypeDescriptor() == fb->dataPosition();
 }
 void* Block::getDataPart() const {
@@ -69,8 +66,7 @@ bool Block::isMarked() const {
  */
 TypeDescriptor* Block::getTypeDescriptor() const {
 	// Remove the LSB from the rawTypeDescriptor pointer
-	// TODO: Do this in a nice way
-	return (TypeDescriptor*) (((uintptr_t) rawTypeDescriptor >> 1) << 1);
+	return (TypeDescriptor*) ((uintptr_t) rawTypeDescriptor & ~1);
 }
 
 /**
@@ -91,14 +87,14 @@ void Block::setTypeDescriptor(TypeDescriptor* descriptor) {
 }
 
 /**
- * Marks the block by setting the LSB of the type descriptor to 1
+ * Sets the mark bit (LSB of the TypeDescriptor) to either one or zero, depending on the provided parameter.
+ * true -> 1
+ * false -> 0
  */
 void Block::mark(bool b) {
 	// Set the LSB to 1
-	if (b)
-		rawTypeDescriptor = (TypeDescriptor*) ((uintptr_t) rawTypeDescriptor | 1);
-	else
-		rawTypeDescriptor = (TypeDescriptor*) (((uintptr_t) rawTypeDescriptor >> 1) << 1);
+	if (isMarked() != b)
+		rawTypeDescriptor = (TypeDescriptor*) ((uintptr_t) rawTypeDescriptor ^ 1);
 }
 
 /**

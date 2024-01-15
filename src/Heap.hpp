@@ -9,6 +9,7 @@
 
 #include "FreeBlock.hpp"
 #include "TypeDescriptor.hpp"
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <list>

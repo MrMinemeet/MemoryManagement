@@ -2,6 +2,7 @@
 #define BLOCK_HPP
 
 #include "TypeDescriptor.hpp"
+#include <cstdint>
 #include <string>
 
 class Block {

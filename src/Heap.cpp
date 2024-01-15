@@ -351,8 +351,9 @@ void Heap::mark(Block* rootPointer) {
 		return;
 	}
 
-	/* Instead of marking the currently visited pointer inside "Block" I decided to use a map here.
-	 * Since this is only needed for the marking phase, I think it is okay to use a map here.
+	/* Instead of storing the currently visited child index inside the Block, the indices are stored in the following map.
+	 * In my opinion this makes more sense compared to using more storage for each Block in general runtime.
+	 * Since these indices are only needed for the marking phase, I think it is okay to use a map here.
 	 */
 	std::unordered_map<Block*, int> currentVisitIndex;
 

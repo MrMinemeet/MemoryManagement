@@ -32,14 +32,12 @@ int main() {
 	std::cout << "Allocating 'SlideBlock'…" << std::endl;
 	UsedBlock* b1 = heap.alloc("SlideBlock");
 	// I just use "new" here to trigger the constructor
-	// FIXME: Something is wrong when the SlideBlock constructor is called and sets the pointers to null.
 	SlideBlock* sb1 = new (b1->getDataPart()) SlideBlock();
 
 
 	std::cout << std::endl;
 	std::cout << "Allocating 'SlideBlock' again…" << std::endl;
 	UsedBlock* b2 = heap.alloc("SlideBlock");
-	// FIXME: Same as with sb1
 	SlideBlock* sb2 = new (b2->getDataPart()) SlideBlock();
 	sb1->x = (Block*) sb2;
 
