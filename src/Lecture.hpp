@@ -3,10 +3,11 @@
 
 #include <string>
 /**
- * Size of Z Bytes
+ * Size of 48 Bytes
  * - 4 byte for id			(0 offset)
- * - X byte for name		(X offset)
- * - 4 byte for semester	(X offset)
+ * - 4 byte padding			(4 offset)
+ * - 32 byte for name		(8 offset)
+ * - 4 byte for semester	(40 offset)
  */
 class Lecture {
 public:

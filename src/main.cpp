@@ -2,6 +2,11 @@
 #include "Heap.hpp"
 #include "SlideBlock.hpp"
 #include "TypeDescriptor.hpp"
+#include "Lecture.hpp"
+#include "LectNode.hpp"
+#include "Student.hpp"
+#include "StudNode.hpp"
+#include "StudentList.hpp"
 #include <iostream>
 #include <string>
 
