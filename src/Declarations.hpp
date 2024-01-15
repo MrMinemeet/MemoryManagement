@@ -11,6 +11,6 @@
  * It happens more often with the DEBUG flag enabled.
  * I don't know why this happens, maybe you can figure it out :)
 */
-#define DEBUG false
+#define DEBUG true
 
 #endif

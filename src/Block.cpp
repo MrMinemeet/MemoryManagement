@@ -3,11 +3,12 @@
 #include "FreeBlock.hpp"
 
 /*
- * The head takes 8 bytes in memory for the typeDescriptor pointer.
+ * The head takes 8 bytes in memory for the rawTypeDescriptor pointer.
+ * Somehow still uses 16 bytes when using "sizeof(Block)".
  * The rest depends on if it is a used or free block
  */
 Block::Block(TypeDescriptor* typeDescriptor) {
-	this->typeDescriptor = typeDescriptor;
+	this->rawTypeDescriptor = typeDescriptor;
 }
 
 std::string Block::ToString() const {
@@ -32,19 +33,75 @@ std::string Block::ToString() const {
  */
 bool Block::isFreeBlock() const {
 	FreeBlock* fb = (FreeBlock*) this;
-	return (void*) fb->typeDescriptor == fb->dataPosition();
+	return (void*) fb->getTypeDescriptor() == fb->dataPosition();
 }
 void* Block::getDataPart() const {
 	// "this + sizeof(Block)" is the effective getDataPart for the block
-	return (void*) (this + headerSize());
+	return (void*) ((char*) this + headerSize());
 }
 
 int Block::totalSize() const {
-	return typeDescriptor->totalSize + headerSize();
+	return getTypeDescriptor()->totalSize + headerSize();
 }
 int Block::headerSize() const {
 	return sizeof(Block);
 }
 int Block::dataSize() const {
-	return typeDescriptor->totalSize;
+	return getTypeDescriptor()->totalSize;
+}
+
+/**
+ * Checks for the Mark-Bit in the type descriptor.
+ * @return  If the LSB is 1 it is marked and true is returned., otherwise returns false
+ */
+bool Block::isMarked() const {
+	// Check if the lsb is a 1 or a 0
+	ulong maskedAddress = ((uintptr_t) rawTypeDescriptor & 1);
+	return maskedAddress == 1;
+}
+
+/**
+ * Getter which does not include the Mark bit, which is stored in the type descriptor
+ * @return The sanitized TypeDescriptor pointer
+ */
+TypeDescriptor* Block::getTypeDescriptor() const {
+	// Remove the LSB from the rawTypeDescriptor pointer
+	return (TypeDescriptor*) ((uintptr_t) rawTypeDescriptor & ~1);
+}
+
+/**
+ * Returns the typeDescriptor as stored in the block.
+ * This will include the Mark bit! Be careful when using this function.
+ * @return The raw type descriptor
+ */
+TypeDescriptor* Block::getRawTypeDescriptor() const {
+	return rawTypeDescriptor;
+}
+
+/**
+ * Sets the passed value as the new type descriptor
+ * @param descriptor The new type descriptor
+ */
+void Block::setTypeDescriptor(TypeDescriptor* descriptor) {
+	rawTypeDescriptor = descriptor;
+}
+
+/**
+ * Sets the mark bit (LSB of the TypeDescriptor) to either one or zero, depending on the provided parameter.
+ * true -> 1
+ * false -> 0
+ */
+void Block::mark(bool b) {
+	// Set the LSB to 1
+	if (isMarked() != b)
+		rawTypeDescriptor = (TypeDescriptor*) ((uintptr_t) rawTypeDescriptor ^ 1);
+}
+
+/**
+ * Returns the pointer to the child at the given offset.
+ * @param offset The offset of the child
+ * @return The pointer to the child
+ */
+void* Block::getChildPointer(int offset) const {
+	return (char*) getDataPart() + offset;
 }

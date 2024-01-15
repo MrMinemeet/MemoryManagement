@@ -11,7 +11,7 @@
 
 /*
  * A special "Block" that is used to mark used memory.
- * The "typeDescriptor" points to a position which is outside the block.
+ * The "rawTypeDescriptor" points to a position which is outside the block.
  * The data part contains the actual data of the Object associated with the Blocks type.
  */
 class UsedBlock : public Block {

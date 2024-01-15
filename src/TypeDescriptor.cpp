@@ -11,12 +11,7 @@ TypeDescriptor::TypeDescriptor(int obj_size, int pointer_offset_array[], int off
 	this->offsetAmount = offset_amount;
 }
 
-TypeDescriptor::~TypeDescriptor() {
-    // Destructor implementation
-    delete(this->pointerOffsetArray);
-}
-
-std::string TypeDescriptor::ToString() {
+std::string TypeDescriptor::ToString() const {
 	// ToString implementation
 	std::string str = "TypeDescriptor { ";
 	str += "Object dataSize: " + std::to_string(this->totalSize) + ", ";
