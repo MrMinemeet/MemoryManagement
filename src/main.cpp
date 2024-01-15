@@ -54,7 +54,7 @@ int main() {
 											   2);
 	heap.registerType("StudNode", studNode_td);
 
-	TypeDescriptor studentList_td = TypeDescriptor(8,
+	TypeDescriptor studentList_td = TypeDescriptor(16,
 											   new int[1]{0},
 											   1);
 	heap.registerType("StudentList", studentList_td);
