@@ -21,7 +21,7 @@ public:
 	std::string name;
 	LectNode* lect;
 	void add(Lecture* lecture);
-	void remove(Lecture lecture);
+	void remove(Lecture* lecture);
 };
 
 #endif//MEMORYMANAGEMENT_STUDENT_HPP
