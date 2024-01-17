@@ -77,8 +77,13 @@ int main() {
 
 	void* rootPointers[] = { nullptr, nullptr };
 	rootPointers[0] = ub;
-
+	/*
 	heap.dump();
+	heap.gc(rootPointers);
+	heap.dump();
+	*/
+	studentList->remove(s1);
+
 	heap.gc(rootPointers);
 	heap.dump();
 

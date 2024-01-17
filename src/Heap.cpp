@@ -402,6 +402,7 @@ void Heap::mark(Block* rootPointer) {
 				break;
 			}
 
+			// TODO: rename variables and reuse some
 			Block* lecture = cur;
 			Block* lectNode = prevOfChild;
 
@@ -415,9 +416,7 @@ void Heap::mark(Block* rootPointer) {
 			Block* pointerToLecture = (Block*)((char*) lecture + sizeof(Block));
 			*pointerFromLectNodeToLecturePointer = pointerToLecture;
 
-			int dummyForBreakpoint = 0;
 			/*
-
 			Block* tmp = (Block*) cur; // The "Block tmp" in the slides
 			cur = prevOfChild;
 			int newCurIdx = currentVisitIndex[cur];
@@ -465,6 +464,7 @@ void Heap::sweep() {
 			int newFreeBlkSize = cur->dataSize();
 			// Free up data size of current
 
+			// FIXME: total free bytes are still off!
 			if (!cur->isFreeBlock()) {
 				// Datasize of FREE-blocks should be ignored (we do not "collect" them)
 				free_bytes += cur->dataSize();
@@ -484,10 +484,8 @@ void Heap::sweep() {
 
 				nextBlk = (Block*) ((char*) nextBlk + nextBlk->totalSize());
 			}
-			cur->setTypeDescriptor((TypeDescriptor*) cur->getDataPart()); // cur.tag = cur
-			FreeBlock* newFree = (FreeBlock*) cur;
-			newFree->setNextFreePointer(nullptr);
-			newFree->setObjSize(cur->headerSize() + newFreeBlkSize); // cur.tag.curDataSize = curDataSize
+
+			FreeBlock* newFree = new (cur) FreeBlock(newFreeBlkSize);
 
 			if(newFbHead == nullptr) {
 				// New freeList was empty until nuw
@@ -500,7 +498,7 @@ void Heap::sweep() {
 			fbListCur = newFree;
 
 			// Move curr by current head + newFreeBlkSize of this data and total of next newFbHead blocks
-			nextBlockOffset = cur->headerSize() + newFreeBlkSize;
+			nextBlockOffset = newFree->totalSize();
 		}
 		cur = (Block*) ((char*) cur + nextBlockOffset);
 	}
