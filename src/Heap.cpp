@@ -102,34 +102,6 @@ UsedBlock* Heap::alloc(const std::string& type) {
 	return block;
 }
 
-/*
-// Commented out, as I think this is not actually needed.
-// The GC should perform deallocate of unused blocks in a more general context.
-void Heap::dealloc(Block* block) {
-	std::cout << "Deallocating memory..." << std::endl;
-
-	auto p = (Block*) heap_buffer;
-	Block* left = nullptr;
-	while (p != block) {
-		left = p;
-		p = (Block*) ((char*) p + p->dataSize() + sizeof(Block));
-	}
-	if (left != nullptr && !left->used) {
-		// merge left
-	} else {
-		// add p to freelist
-	}
-
-	Block* right = (Block*) ((char*) p + p->dataSize() + (int) sizeof(Block));
-	if (!right->used) {
-		// remove right from freelist
-		// merge p and right
-	}
-
-	// Implement the reallocation logic here
-}
-*/
-
 /// Register a rawTypeDescriptor with the Heap. Will return true if the rawTypeDescriptor was successfully registered, false otherwise.
 bool Heap::registerType(const std::string& type, TypeDescriptor& descriptor) {
 	if (type_map.find(type) != type_map.end()) {
@@ -331,15 +303,6 @@ void Heap::gc(void* rootPointers[]) {
 	sweep();
 }
 
-/**
- * Call GC with an array of root pointers.
- * @param rootPointers array of Block root pointers
- */
-void Heap::gc(Block* rootPointers[]) {
-	// Basically just a helper because of size difference between void* and Block* when using indices access
-	gc((void**) rootPointers);
-}
-
 
 /**
  * Marks objects that can be (in-)directly reached from the roots.
@@ -404,30 +367,16 @@ void Heap::mark(Block* rootPointer) {
 				break;
 			}
 
-			// TODO: rename variables and reuse some
-			Block* lecture = cur;
-			Block* lectNode = prevOfChild;
+			Block* tmp = cur;
+			Block* prev = prevOfChild;
 
-			cur = lectNode;
+			cur = prev;
 
-			int lectNodeCurIdx = currentVisitIndex[lectNode];
-			int offset = lectNode->getTypeDescriptor()->pointerOffsetArray[lectNodeCurIdx];
-			prevOfChild = *(Block**) lectNode->getChildPointer(offset);
+			int parentIndex = currentVisitIndex[prev];
+			int offset = prev->getTypeDescriptor()->pointerOffsetArray[parentIndex];
+			prevOfChild = *(Block**) prev->getChildPointer(offset);
 
-			Block** pointerFromLectNodeToLecturePointer = (Block**) ((char*) lectNode->getDataPart() + offset);
-			Block* pointerToLecture = (Block*)((char*) lecture + sizeof(Block));
-			*pointerFromLectNodeToLecturePointer = pointerToLecture;
-
-			/*
-			Block* tmp = (Block*) cur; // The "Block tmp" in the slides
-			cur = prevOfChild;
-			int newCurIdx = currentVisitIndex[cur];
-			int offset = cur->getTypeDescriptor()->pointerOffsetArray[newCurIdx]; // offset of prevOfChild in cur
-			void** childPointerAddr = (void**) tmp->getChildPointer(offset); // cur.td.pointerOffset[curIdx]
-			prevOfChild = (Block*) *childPointerAddr; // prevOfChild = cur.td.pointerOffset[curIdx]
-			//prevOfChild = (Block*) *((Block**) ((char*) cur->getDataPart() + )); // prevOfChild = cur.td.pointerOffset[curIdx]
-			*((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])) = (Block*)((char*)tmp + sizeof(Block)); // cur.td.pointerOffset[curIdx] = tmp
-*/
+			*((Block**) ((char*) prev->getDataPart() + offset)) = (Block*)((char*) tmp + sizeof(Block));
 		}
 	}
 }
