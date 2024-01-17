@@ -74,24 +74,25 @@ int main() {
 	studentList->add(s2);
 	studentList->add(s1);
 	studentList->add(s0);
+	heap.dump();
 
 	void* rootPointers[] = { nullptr, nullptr };
+
+	// Complete data structure
 	rootPointers[0] = ub;
-	/*
-	heap.dump();
 	heap.gc(rootPointers);
 	heap.dump();
-	*/
+
+	// Remove one student
 	studentList->remove(s1);
-
 	heap.gc(rootPointers);
 	heap.dump();
 
-	/*
+	// Remove pointer to student list
 	rootPointers[0] = nullptr;
 	heap.gc(rootPointers);
 	heap.dump();
-	*/
+
 
 	/*
 	std::cout << std::endl;
