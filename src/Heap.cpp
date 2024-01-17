@@ -209,7 +209,9 @@ void Heap::dump() const {
 
 			str += "\tUsed Block {\n";
 			str += "\t\tHeader-Address: " + Heap::pointerToHexString((int*) ubCur) + "\n";
+			str += "\t\tHeader-Size: " + std::to_string(ubCur->headerSize()) + "\n";
 			str += "\t\tData-Address: " + Heap::pointerToHexString((int*) data) + "\n";
+			str += "\t\tData-Size: " + std::to_string(ubCur->dataSize()) + "\n";
 			str += "\t\tType: " + getTypeDescriptorName(type) + "\n";
 			str += "\t\tIs marked: " + boolToString(ubCur->isMarked()) + "\n"; // This was not requested but I found it very helpful
 			str += "\t\tFirst 4 bytes: [ ";
@@ -446,17 +448,19 @@ void Heap::sweep() {
 		Block bCur = *cur;
 		int nextBlockOffset = 0;
 		if(cur->isMarked()) {
-			// Keep "cur"
+			// --- Keep "cur"
 #if DEBUG
 			std::cout << "Keeping block with address " << pointerToHexString((int*) cur) << " and data " << cur->totalSize() << " bytes" << std::endl;
 #endif
 			cur->mark(false);
 			nextBlockOffset = cur->headerSize() + cur->dataSize();
 		} else {
-			// Collect "cur"
+			// --- Collect "cur" + potential adjacent free blocks
 #if DEBUG
 			if (!cur->isFreeBlock()) {
-				std::cout << "Collecting block with address " << pointerToHexString((int*) cur) << " and data " << cur->totalSize() << " bytes" << std::endl;
+				std::cout << "Collecting used block with address " << pointerToHexString((int*) cur) << " and data " << cur->dataSize() << " bytes" << std::endl;
+			} else {
+				std::cout << "Block at " << pointerToHexString((int*) cur) << " is already free! Checking for possible merge" << std::endl;
 			}
 #endif
 			Block* nextBlk = (Block*)((char*) cur + cur->totalSize());
@@ -464,20 +468,19 @@ void Heap::sweep() {
 			int newFreeBlkSize = cur->dataSize();
 			// Free up data size of current
 
-			// FIXME: total free bytes are still off!
 			if (!cur->isFreeBlock()) {
-				// Datasize of FREE-blocks should be ignored (we do not "collect" them)
-				free_bytes += cur->dataSize();
+				// Clean head + data (they don't count as "used" storage when making the "cur" a free block)
+				free_bytes += cur->totalSize();
 			}
 
 			while(nextBlk < getHeapEnd() && !nextBlk->isMarked()) {
+#if true
+				std::cout << "Merging block at " << pointerToHexString((int*) nextBlk) << " with a total of " << nextBlk->totalSize() << " bytes int current" << std::endl;
+#endif
 				// Merge with next prevFree block
 				newFreeBlkSize += nextBlk->totalSize();
 
-				if(nextBlk->isFreeBlock()) {
-					// Add FREE-block header to prevFree bytes. Data size was already included in "free_bytes"
-					free_bytes += nextBlk->headerSize();
-				} else {
+				if(!nextBlk->isFreeBlock()) {
 					// A used UNMARKED block -> Add total size as re-claimed
 					free_bytes += nextBlk->totalSize();
 				}
