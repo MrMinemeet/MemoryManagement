@@ -73,11 +73,11 @@ int main() {
 	ub = heap.alloc("StudentList");
 	StudentList* studentList = new (ub->getDataPart()) StudentList();
 
-	studentList->add(s0);
-	studentList->add(s1);
 	studentList->add(s2);
+	studentList->add(s1);
+	studentList->add(s0);
 
-	void* rootPointers[] = { nullptr };
+	void* rootPointers[] = { nullptr, nullptr };
 	rootPointers[0] = ub;
 
 	heap.dump();
