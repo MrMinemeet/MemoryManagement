@@ -323,7 +323,7 @@ void Heap::gc(void* rootPointers[]) {
 		void* rootPointer = rootPointers[i];
 		mark(static_cast<Block*>(rootPointer));
 	}
-#if true
+#if DEBUG
 	dump();
 #endif
 
@@ -474,7 +474,7 @@ void Heap::sweep() {
 			}
 
 			while(nextBlk < getHeapEnd() && !nextBlk->isMarked()) {
-#if true
+#if DEBUG
 				std::cout << "Merging block at " << pointerToHexString((int*) nextBlk) << " with a total of " << nextBlk->totalSize() << " bytes int current" << std::endl;
 #endif
 				// Merge with next prevFree block
