@@ -17,8 +17,7 @@
 
 class Heap {
 private:
-	// TODO: Adjust heap to 32 KiB for the final submission
-	const int HEAP_SIZE = 1 KiB;// as bytes
+	const int HEAP_SIZE = 32 KiB;// as bytes
 	void* heap_buffer;
 	uint free_bytes;
 	FreeBlock* fbHead;

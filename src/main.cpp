@@ -95,6 +95,7 @@ int main() {
 
 
 	/*
+	 * // Example from the slides:
 	std::cout << std::endl;
 	std::cout << "Allocating 'SlideBlock'…" << std::endl;
 	UsedBlock* b1 = heap.alloc("SlideBlock");
@@ -129,30 +130,6 @@ int main() {
 	std::cout << "Testing garbage collection when something is to collect…" << std::endl;
 	heap.gc(rootPointers);
 	heap.dump();
-
-
-
-	/*
-	Block* a = heap.alloc(512);
-	Block* b = heap.alloc(400);
-	Block* c = heap.alloc(8 KiB);
-	//Block* d = heap.alloc(8 KiB);
-
-	std::cout << heap.ToString() << std::endl;
-	heap.dealloc(a);
-
-	int* array = new int[2];
-	array[0] = 1;
-	array[1] = 2;
-
-	std::string rawTypeDescriptor = "int";
-	TypeDescriptor descriptor(8, array, 2);
-	std::cout << descriptor.ToString() << std::endl;
-
-	heap.registerType(rawTypeDescriptor, descriptor);
-
-	std::cout << heap.ToString() << std::endl;
-
 	*/
 	return 0;
 }
