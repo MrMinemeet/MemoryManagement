@@ -17,26 +17,10 @@ int main() {
 	std::cout << "DEBUG-mode enabled!" << std::endl;
 #endif
 	std::cout << "Hello, GC user!" << std::endl;
-	//heap.dump();
-	/*
-	// TD based on "Garbage Collection" slide-set page 22
-	// Create TypeDescriptor for a class (Block x; Block y; int getDataPart; Block z;)
-	std::cout << std::endl;
-	std::cout << "Creating TypeDescriptor for class 'SlideBlock'…" << std::endl;
-	TypeDescriptor td = TypeDescriptor(32,
-									   new int[3]{0, 8, 24}, // For offset explanation see SlideBlock.hpp
-									   3);
-	std::cout << td.ToString() << std::endl;
-	if (heap.registerType("SlideBlock", td)) {
-		std::cout << "Successfully registered rawTypeDescriptor!" << std::endl;
-	} else {
-		std::cout << "Failed to register rawTypeDescriptor!" << std::endl;
-		return 1;
-	}
-	*/
+
 	TypeDescriptor lecture_td = TypeDescriptor(48,
-									   new int[3]{0,8,40},
-									   3);
+									   new int[0]{},
+									   0);
 	heap.registerType("Lecture", lecture_td);
 
 	TypeDescriptor lectNode_td = TypeDescriptor(16,
@@ -45,8 +29,8 @@ int main() {
 	heap.registerType("LectNode", lectNode_td);
 
 	TypeDescriptor student_td = TypeDescriptor(48,
-											   new int[3]{0,8, 40},
-											   3);
+											   new int[1]{40},
+											   1);
 	heap.registerType("Student", student_td);
 
 	TypeDescriptor studNode_td = TypeDescriptor(16,
@@ -59,6 +43,7 @@ int main() {
 											   1);
 	heap.registerType("StudentList", studentList_td);
 
+	heap.dump();
 
 	UsedBlock* ub = heap.alloc("Lecture");
 	Lecture* l0 = new (ub->getDataPart()) Lecture();
@@ -92,6 +77,11 @@ int main() {
 	studentList->add(s1);
 	studentList->add(s2);
 
+	void* rootPointers[] = { nullptr };
+	rootPointers[0] = ub;
+
+	heap.dump();
+	heap.gc(rootPointers);
 	heap.dump();
 
 	/*
