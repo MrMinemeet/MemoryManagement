@@ -11,4 +11,26 @@ void StudentList::add(Student* student) {
 	first = sn;
 }
 
-void StudentList::remove(Student* student) {}
+void StudentList::remove(Student* student) {
+	StudNode* prev = nullptr;
+	StudNode* cur = first;
+
+	while (cur != nullptr && cur->stud != student) {
+		prev = cur;
+		cur = cur->next;
+	}
+
+	if (cur == nullptr) {
+		// Student not in list
+		return;
+	}
+
+	// Student in list, remove
+	if (prev == nullptr) {
+		// Student was 1st element
+		first = cur->next;
+	} else {
+		// Student was somewhere else
+		prev->next = cur->next;
+	}
+}
