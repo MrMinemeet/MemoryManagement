@@ -208,7 +208,8 @@ void Heap::dump() const {
 			TypeDescriptor* type = ubCur->getTypeDescriptor();
 
 			str += "\tUsed Block {\n";
-			str += "\t\tAddress: " + Heap::pointerToHexString((int*) ubCur) + "\n";
+			str += "\t\tHeader-Address: " + Heap::pointerToHexString((int*) ubCur) + "\n";
+			str += "\t\tData-Address: " + Heap::pointerToHexString((int*) data) + "\n";
 			str += "\t\tType: " + getTypeDescriptorName(type) + "\n";
 			str += "\t\tIs marked: " + boolToString(ubCur->isMarked()) + "\n"; // This was not requested but I found it very helpful
 			str += "\t\tFirst 4 bytes: [ ";
@@ -320,7 +321,7 @@ void Heap::gc(void* rootPointers[]) {
 		void* rootPointer = rootPointers[i];
 		mark(static_cast<Block*>(rootPointer));
 	}
-#if DEBUG
+#if true
 	dump();
 #endif
 
@@ -355,7 +356,7 @@ void Heap::mark(Block* rootPointer) {
 	 */
 	std::unordered_map<Block*, int> currentVisitIndex;
 
-	Block* prev = nullptr;
+	Block* prevOfChild = nullptr;
 	Block* cur = rootPointer;// Don't want to use rootPointer directly, as it is a parameter
 	while (true) {
 		if (!currentVisitIndex.contains(cur)) {
@@ -383,9 +384,11 @@ void Heap::mark(Block* rootPointer) {
 			if(*childPointerAddr != nullptr) {
 				Block* child = (Block*) ((char*) *childPointerAddr - sizeof(Block));
 				if (child != nullptr && !child->isMarked()) {
-					// cur.td.pointerOffset[curIdx] = prev
-					*childPointerAddr = prev;
-					prev = cur;
+					int offset = cur->getTypeDescriptor()->pointerOffsetArray[curIdx];
+					void** childPointerAddr = (void**) cur->getChildPointer(offset);
+					// cur.td.pointerOffset[curIdx] = prevOfChild
+					*childPointerAddr = prevOfChild;
+					prevOfChild = cur;
 					cur = child;
 				}
 			}
@@ -394,14 +397,22 @@ void Heap::mark(Block* rootPointer) {
 #if DEBUG
 			std::cout << "Retreating from block " << cur << std::endl;
 #endif
-			if (prev == nullptr) {
+			if (prevOfChild == nullptr) {
 				// Done
 				break;
 			}
-			Block* p = (Block*) ((char*) cur + sizeof(Block));
-			cur = prev;
-			prev = (Block*) *((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])); // prev = cur.td.pointerOffset[curIdx]
-			*((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])) = p; // cur.td.pointerOffset[curIdx] = p
+
+			/*
+
+			Block* tmp = (Block*) cur; // The "Block tmp" in the slides
+			cur = prevOfChild;
+			int newCurIdx = currentVisitIndex[cur];
+			int offset = cur->getTypeDescriptor()->pointerOffsetArray[newCurIdx]; // offset of prevOfChild in cur
+			void** childPointerAddr = (void**) tmp->getChildPointer(offset); // cur.td.pointerOffset[curIdx]
+			prevOfChild = (Block*) *childPointerAddr; // prevOfChild = cur.td.pointerOffset[curIdx]
+			//prevOfChild = (Block*) *((Block**) ((char*) cur->getDataPart() + )); // prevOfChild = cur.td.pointerOffset[curIdx]
+			*((Block**) ((char*) cur->getDataPart() + cur->getTypeDescriptor()->pointerOffsetArray[curIdx])) = (Block*)((char*)tmp + sizeof(Block)); // cur.td.pointerOffset[curIdx] = tmp
+*/
 		}
 	}
 }
