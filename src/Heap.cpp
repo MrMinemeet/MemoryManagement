@@ -402,6 +402,20 @@ void Heap::mark(Block* rootPointer) {
 				break;
 			}
 
+			Block* lecture = cur;
+			Block* lectNode = prevOfChild;
+
+			cur = lectNode;
+
+			int lectNodeCurIdx = currentVisitIndex[lectNode];
+			int offset = lectNode->getTypeDescriptor()->pointerOffsetArray[lectNodeCurIdx];
+			prevOfChild = *(Block**) lectNode->getChildPointer(offset);
+
+			Block** pointerFromLectNodeToLecturePointer = (Block**) ((char*) lectNode->getDataPart() + offset);
+			Block* pointerToLecture = (Block*)((char*) lecture + sizeof(Block));
+			*pointerFromLectNodeToLecturePointer = pointerToLecture;
+
+			int dummyForBreakpoint = 0;
 			/*
 
 			Block* tmp = (Block*) cur; // The "Block tmp" in the slides
@@ -442,13 +456,20 @@ void Heap::sweep() {
 		} else {
 			// Collect "cur"
 #if DEBUG
-			std::cout << "Collecting block with address " << pointerToHexString((int*) cur) << " and data " << cur->totalSize() << " bytes" << std::endl;
+			if (!cur->isFreeBlock()) {
+				std::cout << "Collecting block with address " << pointerToHexString((int*) cur) << " and data " << cur->totalSize() << " bytes" << std::endl;
+			}
 #endif
 			Block* nextBlk = (Block*)((char*) cur + cur->totalSize());
 
 			int newFreeBlkSize = cur->dataSize();
 			// Free up data size of current
-			free_bytes += cur->dataSize();
+
+			if (!cur->isFreeBlock()) {
+				// Datasize of FREE-blocks should be ignored (we do not "collect" them)
+				free_bytes += cur->dataSize();
+			}
+
 			while(nextBlk < getHeapEnd() && !nextBlk->isMarked()) {
 				// Merge with next prevFree block
 				newFreeBlkSize += nextBlk->totalSize();
@@ -465,6 +486,7 @@ void Heap::sweep() {
 			}
 			cur->setTypeDescriptor((TypeDescriptor*) cur->getDataPart()); // cur.tag = cur
 			FreeBlock* newFree = (FreeBlock*) cur;
+			newFree->setNextFreePointer(nullptr);
 			newFree->setObjSize(cur->headerSize() + newFreeBlkSize); // cur.tag.curDataSize = curDataSize
 
 			if(newFbHead == nullptr) {

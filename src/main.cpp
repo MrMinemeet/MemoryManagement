@@ -43,8 +43,6 @@ int main() {
 											   1);
 	heap.registerType("StudentList", studentList_td);
 
-	heap.dump();
-
 	UsedBlock* ub = heap.alloc("Lecture");
 	Lecture* l0 = new (ub->getDataPart()) Lecture();
 	ub = heap.alloc("Lecture");
@@ -83,6 +81,12 @@ int main() {
 	heap.dump();
 	heap.gc(rootPointers);
 	heap.dump();
+
+	/*
+	rootPointers[0] = nullptr;
+	heap.gc(rootPointers);
+	heap.dump();
+	*/
 
 	/*
 	std::cout << std::endl;
